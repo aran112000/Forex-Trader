@@ -26,11 +26,11 @@ class _analysis_test_runner {
             } else {
                 throw new InvalidArgumentException('This is not a valid test case');
             }
-        }
-
-        foreach ($this->test_cases as $class) {
-            /**@var _analysis_test_case $class */
-            $class->initTest();
+        } else {
+            foreach ($this->test_cases as $class) {
+                /**@var _analysis_test_case $class */
+                $class->initTest();
+            }
         }
     }
 
@@ -43,7 +43,7 @@ class _analysis_test_runner {
                 $filename = basename($file, '.php');
                 if (substr($filename, 0, 1) != '_') {
                     /**@var _analysis_test_case $class */
-                    $this->test_cases[$filename] = new $filename();
+                    $this->test_cases[str_replace('test_', '', $filename)] = new $filename();
                 }
             }
         }

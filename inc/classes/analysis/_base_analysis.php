@@ -6,6 +6,11 @@
 abstract class _base_analysis {
 
     /**
+     * @var string|null - 'major' OR 'minor'
+     */
+    public $signal_strength = null;
+
+    /**
      * @var bool
      */
     protected $enabled = true;
@@ -46,7 +51,7 @@ abstract class _base_analysis {
      *
      */
     protected function getData() {
-        if ($this->data === null) {
+        if ($this->data === []) {
             $this->setData();
         }
         return $this->data;

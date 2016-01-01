@@ -37,7 +37,7 @@ class log {
      */
     private static function appendToFile(string $str, string $filename) {
         if ($file = fopen($filename, 'a')) {
-            fwrite($file, '[' . date('d/m/Y H:i:s') . '] ' . $str."\n--------------------------------------------------------------------------------------------------------------------\n");
+            fwrite($file, '[' . date('d/m/Y H:i:s') . '] ' . trim($str, "\n")."\n--------------------------------------------------------------------------------------------------------------------\n");
             fclose($file);
         } else {
             trigger_error('Failed to open file: ' . $filename);

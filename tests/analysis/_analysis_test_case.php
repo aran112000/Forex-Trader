@@ -52,7 +52,7 @@ abstract class _analysis_test_case {
      * @return bool
      */
     protected function assertTradeableScore(float $score): bool {
-        return ($score >= _analysis::MINIMUM_SCORE_TO_TRADE);
+        return ($score >= 0.5);
     }
 
     /**

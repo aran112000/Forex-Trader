@@ -5,8 +5,8 @@
  */
 final class _analysis {
 
-    const SECONDS_BETWEEN_ANALYSIS_PROCESSES = 60;
-    const MINIMUM_SCORE_TO_TRADE = 0.6;
+    const SECONDS_BETWEEN_ANALYSIS_PROCESSES = 10;
+    const MINIMUM_SCORE_TO_TRADE = 1.90;
 
     private $analysis_methods = null;
 
@@ -26,12 +26,15 @@ final class _analysis {
             /**@var _pair $pair*/
             $workers[] = function() use ($pair) {
                 while (true) {
-                    $score = $this->doTestPair($pair);
+                    $score_details = $this->doTestPair($pair);
 
-                    if ($score >= self::MINIMUM_SCORE_TO_TRADE) {
+                    log::write($pair->getPairName() . ' pricing analysis score: ' . $score_details['score'] . ' - Details: ' . print_r($score_details, true), LOG::DEBUG);
+                    if ($score_details['score'] >= self::MINIMUM_SCORE_TO_TRADE) {
+                        log::write($pair->getPairName() . ' - Signals show we\'re good to trade - Score: ' . $score_details['score'], LOG::DEBUG);
                         socket::send('analysis_result', [
                             'pair' => $pair->getPairName(),
-                            'score' => $score,
+                            'score' => $score_details['score'],
+                            'details' => $score_details,
                             'message' => 'This looks good... Lets trade!'
                         ]);
                     }
@@ -50,17 +53,29 @@ final class _analysis {
      *
      * @return float
      */
-    private function doTestPair(_pair $currency_pair): float {
-        $score = 0;
-        $total_tests = count($this->analysis_methods);
-        foreach ($this->analysis_methods as $class) {
+    private function doTestPair(_pair $currency_pair): array {
+        $score_details = [
+            'score' => 0,
+            'details' => []
+        ];
+        foreach ($this->analysis_methods as $test_class_name => $class) {
             /**@var _base_analysis $class*/
             $class->setPair($currency_pair);
-            $score += $class->doAnalyse();
+            $class->setData([]); // Clear data cache
+            $score = $class->doAnalyse();
+            $score_details['details'][] = [
+                'name' => ucwords(str_replace('_', ' ', $test_class_name)),
+                'score' => $score,
+            ];
+            if ($class->signal_strength == 'minor') {
+                $score_details['score'] += ($score / 10);
+            } else {
+                $score_details['score'] += $score;
+            }
         }
 
         // Return a combined score
-        return ($score / $total_tests);
+        return $score_details;
     }
 
     /**

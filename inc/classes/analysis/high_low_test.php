@@ -6,6 +6,11 @@
 class high_low_test extends _base_analysis {
 
     /**
+     * @var string|null - 'major' OR 'minor'
+     */
+    public $signal_strength = 'major';
+
+    /**
      * @var int
      */
     protected $data_fetch_size = 3;
@@ -55,15 +60,6 @@ class high_low_test extends _base_analysis {
 
                 if ($percentage_candle_body_size_increase >= 33.3) {
                     // The last candle was at least 1/3 smaller than the one that came before it - This looks like a reversal
-                    if (!$this->isTest()) {
-                        socket::send('analysis_result', [
-                            'test' => 'doHighTest',
-                            'pair' => $this->currency_pair->getPairName(),
-                            'score' => $percentage,
-                            'debug' => $data
-                        ]);
-                    }
-
                     return $percentage;
                 }
             }
@@ -110,15 +106,6 @@ class high_low_test extends _base_analysis {
 
                 if ($percentage_candle_body_size_increase >= 33.3) {
                     // The last candle was at least 1/3 smaller than the one that came before it - This looks like a reversal
-                    if (!$this->isTest()) {
-                        socket::send('analysis_result', [
-                            'test' => 'doLowTest',
-                            'pair' => $this->currency_pair->getPairName(),
-                            'score' => $percentage,
-                            'debug' => $data
-                        ]);
-                    }
-
                     return $percentage;
                 }
             }
