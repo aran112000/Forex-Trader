@@ -49,8 +49,7 @@ class multi_process_manager {
      *
      */
     private function init() {
-        $workers_required = count($this->workers);
-        for ($i = 0; $i < $workers_required; $i++) {
+        foreach ($this->workers as $key => $worker_task) {
             $pid = pcntl_fork();
             $this->child_pids[] = $pid;
             if ($pid == -1) {
@@ -61,11 +60,15 @@ class multi_process_manager {
                 $this->parent_thread = true;
             } else {
                 // We are the child
-                $worker_number = ($i + 1);
 
-                cli_set_process_title(APP_NAME . ' - ' . $this->thread_name . ': Child Process #' . $worker_number);
+                if (is_int($key)) {
+                    $process_name = 'Child Process #' . ($key + 1);
+                } else {
+                    $process_name = $key;
+                }
+                cli_set_process_title(APP_NAME . ' - ' . $this->thread_name . ': ' . $process_name);
 
-                call_user_func($this->workers[$i]);
+                call_user_func($this->workers[$key]);
                 break;
             }
         }

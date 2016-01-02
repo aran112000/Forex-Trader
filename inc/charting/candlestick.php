@@ -14,12 +14,12 @@ class candlestick extends base_chart {
         $clean_data = [];
         foreach ($data as $row) {
             $clean_data[] = [
-                'TimeKey' => floor(strtotime($row['entry_time']) / 60),
+                'TimeKey' => $row['timekey'],
                 'Date' => date('d/m/Y H:i:s', strtotime($row['entry_time'])),
-                'Open' => (float) $row['entry_price'],
-                'High' => (float) $row['max_price'],
-                'Low' => (float) $row['min_price'],
-                'Close' => (float) $row['exit_price'],
+                'Open' => (float) $row['open'],
+                'High' => (float) $row['high'],
+                'Low' => (float) $row['low'],
+                'Close' => (float) $row['close'],
                 'Volume' => (int) $row['volume']
             ];
         }

@@ -20,13 +20,17 @@ class ema_20 extends _base_analysis {
      */
     function doAnalyse(): float {
         $data = $this->getData();
-        $this->addEmaToData($data);
-        $latest_data = end($data);
+        if (!empty($data)) {
+            $this->addEmaToData($data);
+            $latest_data = end($data);
 
-        $current_distance_from_ema = number_format(abs($latest_data['exit_price'] - $latest_data['ema_20']), 5, '.', '');
+            if (isset($latest_data['ema_20'])) {
+                $current_distance_from_ema = number_format(abs($latest_data['close'] - $latest_data['ema_20']), 5, '.', '');
 
-        if ($current_distance_from_ema <= 0.00002) {
-            return ($current_distance_from_ema == .00002 ? .75 : 1);
+                if ($current_distance_from_ema <= 0.00002) {
+                    return ($current_distance_from_ema == .00002 ? .75 : 1);
+                }
+            }
         }
 
         return 0;
@@ -39,12 +43,14 @@ class ema_20 extends _base_analysis {
         $exit_prices = [];
 
         foreach ($data as $row) {
-            $exit_prices[] = $row['exit_price'];
+            $exit_prices[] = $row['close'];
         }
 
-        foreach (trader_ema($exit_prices, 20) as $key => $ema_20) {
-            if (isset($data[$key])) {
-                $data[$key]['ema_20'] = $ema_20;
+        if ($ema_data = trader_ema($exit_prices, 20)) {
+            foreach ($ema_data as $key => $ema_20) {
+                if (isset($data[$key])) {
+                    $data[$key]['ema_20'] = $ema_20;
+                }
             }
         }
     }

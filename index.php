@@ -22,15 +22,13 @@ if (!isset($_REQUEST['data'])) {
     var socket = io('http://192.168.1.95:8081');
     socket.on('connect', function () {
         socket.on('price', function (data) {
+            console.log(data);
             if (data.pair == 'AUD_CAD') {
-                console.log(data);
                 plotNewData(data);
             }
         });
         socket.on('analysis_result', function (data) {
-            if (data.pair == 'AUD_CAD') {
-                console.error(data);
-            }
+            console.error(data);
         });
     });
 </script>

@@ -3,8 +3,8 @@ define('APP_NAME', 'Forex Trader');
 setPaths();
 require('autoloader.php');
 
-set::define('cli', (php_sapi_name() === "cli"));
 set::define('live', false);
+set::define('cli', (php_sapi_name() === "cli"));
 
 if (!cli) {
     set::flushableBuffer();

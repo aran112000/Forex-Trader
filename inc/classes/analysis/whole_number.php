@@ -23,19 +23,20 @@ class whole_number extends _base_analysis {
     function doAnalyse(): float {
         $data = $this->getData();
 
-        $latest_data = end($data);
+        if (!empty($data)) {
+            $latest_data = end($data);
+            $decimal_parts = explode('.', $latest_data['close'], 2);
+            $decimal_digits = $decimal_parts[1];
 
-        $decimal_parts = explode('.', $latest_data['exit_price'], 2);
-        $decimal_digits = $decimal_parts[1];
+            if (strlen($decimal_digits) === 4) {
+                if (substr($decimal_digits, -1) === 0) {
+                    // This is a large round number
+                    return 1;
+                }
 
-        if (strlen($decimal_digits) === 4) {
-            if (substr($decimal_digits, -1) === 0) {
-                // This is a large round number
-                return 1;
+                // This is a round number
+                return .75;
             }
-
-            // This is a round number
-            return .75;
         }
 
         return 0;

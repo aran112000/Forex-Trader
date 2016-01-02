@@ -5,7 +5,7 @@
  */
 final class _analysis {
 
-    const SECONDS_BETWEEN_ANALYSIS_PROCESSES = 10;
+    const SECONDS_BETWEEN_ANALYSIS_PROCESSES = 1;
     const MINIMUM_SCORE_TO_TRADE = 1.90;
 
     private $analysis_methods = null;
@@ -18,13 +18,13 @@ final class _analysis {
     }
 
     /**
-     *
+     * @param callable $trade_function
      */
-    public function doAnalysePairs() {
+    public function doAnalysePairs(callable $trade_function) {
         $workers = [];
         foreach (pairs::getPairs() as  $pair) {
             /**@var _pair $pair*/
-            $workers[] = function() use ($pair) {
+            $workers[] = function() use ($pair, $trade_function) {
                 while (true) {
                     $score_details = $this->doTestPair($pair);
 
@@ -35,8 +35,9 @@ final class _analysis {
                             'pair' => $pair->getPairName(),
                             'score' => $score_details['score'],
                             'details' => $score_details,
-                            'message' => 'This looks good... Lets trade!'
                         ]);
+
+                        call_user_func($trade_function, $pair);
                     }
 
                     sleep(self::SECONDS_BETWEEN_ANALYSIS_PROCESSES);

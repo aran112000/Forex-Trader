@@ -36,7 +36,7 @@ abstract class _pair {
         $return = [];
 
         $pair = $this->base_currency . '_' . $this->quote_currency;
-        if ($res = db::query('SELECT * FROM 1_minute_view WHERE pair=\'' . db::esc($pair) . '\' ORDER BY timekey ' . strtoupper($order) . ' LIMIT ' . $limit)) {
+        if ($res = db::query('SELECT * FROM pricing_1_minute WHERE pair=\'' . db::esc($pair) . '\' ORDER BY timekey ' . strtoupper($order) . ' LIMIT ' . $limit)) {
             while ($row = db::fetch($res)) {
                 $return[] = $row;
             }

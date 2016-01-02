@@ -21,9 +21,9 @@ class doji extends _base_analysis {
     public function doAnalyse(): float {
         $data = $this->getData();
 
-        if (isset($data[2])) {
-            $last_price_difference = abs($data[1]['entry_price'] - $data[1]['exit_price']);
-            $prior_price_difference = abs($data[0]['entry_price'] - $data[0]['exit_price']);
+        if (!empty($data) && isset($data[2])) {
+            $last_price_difference = abs($data[1]['open'] - $data[1]['close']);
+            $prior_price_difference = abs($data[0]['open'] - $data[0]['close']);
 
             $price_difference = $prior_price_difference - $last_price_difference;
             if ($price_difference > 0.00002) {
