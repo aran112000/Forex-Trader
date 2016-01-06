@@ -97,9 +97,9 @@ abstract class _analysis_test_case {
      */
     protected function printResults(string $message, array $data = []) {
         if (cli) {
-            echo $message."\n";
+            echo $message . "\n";
             if (!empty($data)) {
-                echo print_r($data, true)."\n";
+                echo print_r($data, true) . "\n";
             }
             echo "----------------------------------------------------------------------------------------------------\n";
         } else {

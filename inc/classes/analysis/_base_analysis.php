@@ -79,9 +79,9 @@ abstract class _base_analysis {
     }
 
     /**
-     * @return float
+     * @return array
      */
-    abstract function doAnalyse(): float;
+    abstract function doAnalyse(): array;
 
     /**
      * @return bool

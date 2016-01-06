@@ -32,31 +32,24 @@ abstract class _pair {
      *
      * @return mixed
      */
-    public function getOneMinuteData(int $limit = 20, $order = 'DESC'): array {
+    public function getOneMinuteData(int $limit = 20, $order = 'ASC'): array {
         $return = [];
 
         $pair = $this->base_currency . '_' . $this->quote_currency;
         if ($res = db::query('SELECT * FROM pricing_1_minute WHERE pair=\'' . db::esc($pair) . '\' ORDER BY timekey ' . strtoupper($order) . ' LIMIT ' . $limit)) {
             while ($row = db::fetch($res)) {
-                $return[] = $row;
-            }
-        }
+                $class = new avg_price_data();
+                $class->pair = $pair;
+                $class->timekey = $row['timekey'];
+                $class->entry_time = $row['entry_time'];
+                $class->exit_time = $row['exit_time'];
+                $class->open = $row['open'];
+                $class->close = $row['close'];
+                $class->high = $row['high'];
+                $class->low = $row['low'];
+                $class->volume = $row['volume'];
 
-        return $return;
-    }
-
-    /**
-     * @param int $limit
-     *
-     * @return mixed
-     */
-    public function getFiveMinuteData(int $limit = 2): array {
-        $return = [];
-
-        $pair = $this->base_currency . '_' . $this->quote_currency;
-        if ($res = db::query('SELECT * FROM 5_minute_view WHERE pair=\'' . db::esc($pair) . '\' ORDER BY timekey DESC LIMIT ' . $limit)) {
-            while ($row = db::fetch($res)) {
-                $return[] = $row;
+                $return[] = $class;
             }
         }
 

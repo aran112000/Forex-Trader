@@ -5,6 +5,11 @@
  */
 class macd extends _base_analysis {
 
+    /**
+     * @var bool
+     */
+    protected $enabled = false;
+
     const FAST_PERIOD   = 12; // Taken from FXCM trading station
     const SLOW_PERIOD   = 26; // Taken from FXCM trading station
     const SIGNAL_PERIOD = 9;  // Taken from FXCM trading station
@@ -20,36 +25,43 @@ class macd extends _base_analysis {
     protected $data_fetch_size = 10080; // 7 days
 
     /**
-     * @return float
+     * @return array
      */
-    public function doAnalyse(): float {
+    public function doAnalyse(): array {
         $data = $this->getData();
+        $score = [
+            'buy' => 0,
+            'sell' => 0,
+        ];
+
         if (!empty($data)) {
             $this->addMacdToData($data);
 
             $last_data_point = end($data);
-            if (isset($last_data_point['macd'])) {
-                $last_macd = abs($last_data_point['macd']);
+            if (isset($last_data_point->macd)) {
+                $last_macd = abs($last_data_point->macd);
 
-                if ($last_macd >= 0.00012) {
-                    return 1;
-                } else if ($last_macd >= 0.00011) {
-                    return .9;
-                } else if ($last_macd >= 0.00010) {
-                    return .8;
-                } else if ($last_macd >= 0.00009) {
-                    return .66;
-                } else if ($last_macd >= 0.00008) {
-                    return .5;
-                } else if ($last_macd >= 0.00007) {
-                    return .43;
-                } else if ($last_macd >= 0.00006) {
-                    return .35;
+                if ($last_macd >= 0.00009) {
+                    if ($last_macd >= 0.00012) {
+                        $score = 1;
+                    } else if ($last_macd >= 0.00011) {
+                        $score = .85;
+                    } else if ($last_macd >= 0.00010) {
+                        $score = .7;
+                    } else {
+                        $score = .5;
+                    }
+
+                    return [
+                        // TODO; Update to work with buy/sell scores
+                        'buy' => $score,
+                        'sell' => $score,
+                    ];
                 }
             }
         }
 
-        return 0;
+        return $score;
     }
 
     /**
@@ -58,7 +70,7 @@ class macd extends _base_analysis {
     private function addMacdToData(array &$data) {
         $exit_prices = [];
         foreach ($data as $row) {
-            $exit_prices[] = $row['close'];
+            $exit_prices[] = $row->close;
         }
 
         if ($macd_data = trader_macd($exit_prices, self::FAST_PERIOD, self::SLOW_PERIOD, self::SIGNAL_PERIOD)) {
@@ -66,7 +78,7 @@ class macd extends _base_analysis {
             foreach ($divergence_data as $key => $macd_divergence) {
                 if (isset($data[$key])) {
                     $macd_divergence = number_format($macd_divergence, 5, '.', '');
-                    $data[$key]['macd'] = $macd_divergence;
+                    $data[$key]->macd = $macd_divergence;
                 }
             }
         }
