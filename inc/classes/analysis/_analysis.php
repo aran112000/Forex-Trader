@@ -22,7 +22,7 @@ final class _analysis {
     /**
      * @param callable $trade_function
      */
-    public function doAnalysePairs(callable $trade_function) {
+    public function doAnalysePairsRecursive(callable $trade_function) {
         $workers = [];
         foreach (pairs::getPairs() as $pair) {
             /**@var _pair $pair*/
@@ -30,7 +30,7 @@ final class _analysis {
                 while (true) {
                     $score_details = $this->doAnalysePair($pair);
 
-                    log::write($pair->getPairName() . ' pricing analysis score: ' . $score_details['score'] . ' - Details: ' . print_r($score_details, true), LOG::DEBUG);
+                    log::write($pair->getPairName() . ' pricing analysis details: ' . print_r($score_details, true), LOG::DEBUG);
                     if ($this->isEntrySignal($score_details)) {
                         log::write($pair->getPairName() . ' - Signals show we\'re good to trade - Score: ' . $score_details['score'], LOG::DEBUG);
                         socket::send('analysis_result', [
@@ -46,9 +46,28 @@ final class _analysis {
                 }
             };
         }
+    }
 
-        // Initialise our workers
-        new multi_process_manager('doAnalysePairs', $workers);
+    /**
+     * @param callable $trade_function
+     */
+    public function doAnalysePairs(callable $trade_function) {
+        foreach (pairs::getPairs() as $pair) {
+            /**@var _pair $pair*/
+            $score_details = $this->doAnalysePair($pair);
+
+            log::write($pair->getPairName() . ' pricing analysis details: ' . print_r($score_details, true), LOG::DEBUG);
+            if ($this->isEntrySignal($score_details)) {
+                log::write($pair->getPairName() . ' - Signals show we\'re good to trade - Score: ' . $score_details['score'], LOG::DEBUG);
+                socket::send('analysis_result', [
+                    'pair' => $pair->getPairName(),
+                    'score' => $score_details['score'],
+                    'details' => $score_details,
+                ]);
+
+                call_user_func($trade_function, $pair);
+            }
+        }
     }
 
     /**

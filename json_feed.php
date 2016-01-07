@@ -1,7 +1,7 @@
 <?php
 require('inc/bootstrap.php');
 
-if ($res = db::query('SELECT * FROM pricing_1_minute WHERE pair=\'AUD_CAD\' ORDER BY timekey ASC')) {
+if ($res = db::query('SELECT * FROM pricing_1d WHERE pair=\'AUD_CAD\' ORDER BY timekey ASC')) {
     $json = [];
     if (db::num($res)) {
         while ($row = db::fetch($res)) {

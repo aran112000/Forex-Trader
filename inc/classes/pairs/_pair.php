@@ -10,6 +10,8 @@ abstract class _pair {
     public $base_currency  = null;
     public $quote_currency = null;
 
+    public $data_fetch_time = '1m';
+
     /**
      * _pair constructor.
      */
@@ -32,11 +34,11 @@ abstract class _pair {
      *
      * @return mixed
      */
-    public function getOneMinuteData(int $limit = 20, $order = 'ASC'): array {
+    public function getData(int $limit = 20, $order = 'DESC'): array {
         $return = [];
 
         $pair = $this->base_currency . '_' . $this->quote_currency;
-        if ($res = db::query('SELECT * FROM pricing_1_minute WHERE pair=\'' . db::esc($pair) . '\' ORDER BY timekey ' . strtoupper($order) . ' LIMIT ' . $limit)) {
+        if ($res = db::query('SELECT * FROM pricing_' . $this->data_fetch_time . ' WHERE pair=\'' . db::esc($pair) . '\' ORDER BY timekey ' . strtoupper($order) . ' LIMIT ' . $limit)) {
             while ($row = db::fetch($res)) {
                 $class = new avg_price_data();
                 $class->pair = $pair;
@@ -51,6 +53,9 @@ abstract class _pair {
 
                 $return[] = $class;
             }
+
+            // Due to the limit we need to now reverse the order of our data so the newest is at the end
+            $return = array_reverse($return);
         }
 
         return $return;

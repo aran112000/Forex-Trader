@@ -15,7 +15,7 @@ class test_trader {
         $candlestick = new candlestick();
         $aud_cad_class = new aud_cad();
 
-        $full_data_set = $aud_cad_class->getOneMinuteData((self::MAXIMUM_DATA_POINTS_TO_TEST + self::MINIMUM_DATA_POINTS_TO_TEST));
+        $full_data_set = $aud_cad_class->getData((self::MAXIMUM_DATA_POINTS_TO_TEST + self::MINIMUM_DATA_POINTS_TO_TEST));
         $rows = count($full_data_set);
 
         for ($i = 1; $i <= $rows; $i++) {

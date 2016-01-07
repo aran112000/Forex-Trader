@@ -26,14 +26,23 @@ class pairs {
     /**
      *
      */
+    public static function getPricingFeed() {
+        while (true) {
+            self::getPricing();
+        }
+    }
+
+    /**
+     *
+     */
     public static function getPricing() {
         $oanda = new oanda_streaming_api();
         $oanda->doApiRequest('prices', ['instruments' => implode(',', self::getPairNames())], 'GET', function (array $response) use ($oanda) {
             $response['time'] = substr($response['time'], 0, 10);
-            $timekey = floor($response['time'] / 60);
 
+            // Daily
             socket::send('price', [
-                'timekey' => $timekey,
+                'timekey' => floor($response['time'] / 86400),
                 'date' => $oanda->timestampToDate($response['time']),
                 'pair' => $response['instrument'],
                 'bid' => $response['bid'],
@@ -42,8 +51,24 @@ class pairs {
 
             db::query('INSERT DELAYED INTO pricing SET pair=\'' . db::esc($response['instrument']) . '\', ts=\'' . $oanda->timestampToMysqlDate($response['time']) . '\', bid=\'' . db::esc($response['bid']) . '\', ask=\'' . db::esc($response['ask']) . '\'');
 
-            db::query('INSERT DELAYED INTO pricing_1_minute SET
-                  timekey=' . $timekey . ',
+            db::query('INSERT DELAYED INTO pricing_1m SET
+                  timekey=' . floor($response['time'] / 60) . ',
+                  pair=\'' . db::esc($response['instrument']) . '\',
+                  entry_time=\'' . date('Y-m-d H:i:s', $response['time']) . '\',
+                  exit_time=\'' . date('Y-m-d H:i:s', $response['time']) . '\',
+                  open=\'' . $response['bid'] . '\',
+                  close=\'' . $response['bid'] . '\',
+                  high=\'' . $response['bid'] . '\',
+                  low=\'' . $response['bid'] . '\',
+                  volume=1
+              ON DUPLICATE KEY UPDATE
+                  exit_time=VALUES(exit_time),
+                  high=IF (high < VALUES(high), VALUES(high), high),
+                  low=IF (low > VALUES(low), VALUES(low), low),
+                  volume=(volume+VALUES(volume))
+              ');
+            db::query('INSERT DELAYED INTO pricing_1d SET
+                  timekey=' . floor($response['time'] / 86400) . ',
                   pair=\'' . db::esc($response['instrument']) . '\',
                   entry_time=\'' . date('Y-m-d H:i:s', $response['time']) . '\',
                   exit_time=\'' . date('Y-m-d H:i:s', $response['time']) . '\',

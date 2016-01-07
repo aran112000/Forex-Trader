@@ -46,6 +46,6 @@ class avg_price_data {
      * @return string
      */
     public function getDirection(): string {
-        return ($this->open > $this->close ? 'down' : 'up');
+        return ($this->open > $this->close ? 'down' : ($this->open < $this->close ? 'up' : 'neutral'));
     }
 }

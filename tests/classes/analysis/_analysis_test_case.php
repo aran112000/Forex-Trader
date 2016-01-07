@@ -78,7 +78,7 @@ abstract class _analysis_test_case {
      */
     private function setSampleData() {
         if ($this->data === null) {
-            $this->data = $this->pair->getOneMinuteData($this->sample_date_size, 'ASC');
+            $this->data = $this->pair->getData($this->sample_date_size, 'ASC');
         }
     }
 

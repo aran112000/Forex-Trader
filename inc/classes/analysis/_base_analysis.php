@@ -40,7 +40,7 @@ abstract class _base_analysis {
      */
     public function setData(array $data = []) {
         if ($data === []) {
-            $this->data = $this->currency_pair->getOneMinuteData($this->data_fetch_size);
+            $this->data = $this->currency_pair->getData($this->data_fetch_size);
         } else {
             // Used by test cases
             $this->data = $data;
