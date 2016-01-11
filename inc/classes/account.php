@@ -9,6 +9,8 @@ final class account {
     private $balance = null;
     private $currency = null;
     private $margin_rate = null;
+    private $open_trades = null;
+    private $open_orders = null;
 
     /**
      * @return float
@@ -26,30 +28,15 @@ final class account {
      */
     private function setAccountDetails() {
         $api = new oanda_rest_api();
-        if ($response = $api->doApiRequest('accounts', [], 'GET')) {
-            $found = false;
-            foreach ($response['accounts'] as $account) {
-                if ($account['accountId'] == oanda_base::ACCOUNT_ID) {
-                    $found = true;
-
-                    $this->account_name = $response['accounts'][0]['accountName'];
-                    $this->currency = $response['accounts'][0]['accountCurrency'];
-                    $this->margin_rate = $response['accounts'][0]['marginRate'];
-
-                    break;
-                }
-            }
-
-            if (!$found) {
-                trigger_error('Failed to fetch account details');
-            }
-        }
-
-        if ($response = $api->doApiRequest('accounts/' . oanda_base::ACCOUNT_ID . '/transactions', [], 'GET')) {
-            // TODO; Confirm the order of results. Is the current balance the first of last element in the returned array?
-            $last_transaction = end($response['transactions']);
-
-            $this->balance = $last_transaction['accountBalance'];
+        if ($response = $api->doApiRequest('accounts/' . oanda_base::ACCOUNT_ID, [], 'GET')) {
+            $this->account_name = $response['accountName'];
+            $this->currency = $response['accountCurrency'];
+            $this->margin_rate = $response['marginRate'];
+            $this->balance = $response['balance'];
+            $this->open_trades = $response['openTrades'];
+            $this->open_orders = $response['openOrders'];
+        } else {
+            trigger_error('Failed to fetch account details');
         }
     }
 }

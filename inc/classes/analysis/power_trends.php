@@ -25,47 +25,71 @@ class power_trends extends _base_analysis {
      * @return array
      */
     public function doAnalyse(): array {
-        if (gmdate('H') >= 22) {
-            $data = $this->getData();
-            array_pop($data);
+        log::write('Power Trend called', log::INFO);
+        $direction = false;
+        $trade_details = [];
 
-            $this->setData($data);
+        // This is ONLY enabled once each day just before 22:00 (a couple of minutes allows for any time delays)
+        if ((defined('testing') && testing) || (gmdate('H:i') === '21:59' && $this->last_run_date !== gmdate('d/m/Y'))) {
+            log::write('Checking for Power Trend as time = 21:59', log::DEBUG);
+
+            $this->last_run_date = gmdate('d/m/Y');
+
+            if ($this->isShortEntry()) {
+                $direction = 'short';
+                $trade_details = $this->getTradeDetails($direction);
+            } else if ($this->isLongEntry()) {
+                $direction = 'long';
+                $trade_details = $this->getTradeDetails($direction);
+            }
+
+            if (!defined('testing') || !testing) {
+                if ($direction !== false) {
+                    log::write($direction . ' trade found', log::DEBUG);
+                    email::send('Power Trends - Entry signal found', '<p>A ' . $direction . ' entry opportunity for ' . $this->currency_pair->getPairName('/') . '</p><p><pre>' . print_r($trade_details, true) . '</pre></p>', 'cdtreeks@gmail.com,jainikadrenkhan@gmail.com');
+                } else {
+                    log::write('No trade found', log::DEBUG);
+                }
+            }
         }
 
-        if ($this->isShortEntry()) {
-            email::send('Power Trends - Short entry found', 'A short entry opportunity for ' . $this->currency_pair->getPairName('/'));
-        } else if ($this->isLongEntry()) {
-            email::send('Power Trends - Long entry found', 'A long entry opportunity for ' . $this->currency_pair->getPairName('/'));
-        }
-
-        return [
-            'sell' => 0,
-            'buy' => 0,
-        ];
+        return $trade_details;
     }
 
     /**
-     * @return bool
+     * @param string $direction
+     *
+     * @return mixed
      */
-    public function isEnabled(): bool {
-        $response = parent::isEnabled();
-        if (!$response) {
-            return $response;
+    private function getTradeDetails(string $direction): array {
+        $data = $this->getData();
+        $data = array_slice($data, -2);
+
+        if ($direction === 'long') {
+            $type = 'Buy';
+            $entry = $data[0]->high + 0.0002;
+            $exit = $data[0]->low - 0.0002;
+        } else {
+            $type = 'Sell';
+            $entry = $data[0]->low - 0.0002;
+            $exit = $data[0]->high + 0.0002;
         }
 
-        // TODO Remove - This is only a test
-        if (!cli) {
-            return true;
-        }
+        $pip_difference = (($entry - $exit) * 10000);
 
-        // This is ONLY enabled once each day just before 22:00 (a couple of minutes allows for any time delays)
-        if (gmdate('H:i') === '21:58' && $this->last_run_date !== gmdate('d/m/Y')) {
-            $this->last_run_date = gmdate('d/m/Y');
+        $account = new account();
+        $balance = $account->getBalance();
 
-            return true;
-        }
+        $amount = $balance / $pip_difference;
 
-        return false;
+        return [
+            'type' => $type,
+            'entry' => $entry,
+            'exit' => $exit,
+            'current_balance' => $balance,
+            'pip_difference' => $pip_difference,
+            'amount' => $amount,
+        ];
     }
 
     /**
@@ -130,7 +154,7 @@ class power_trends extends _base_analysis {
             }
         }
 
-        $last_two_data_points = array_splice($data, -2);
+        $last_two_data_points = array_slice($data, -2);
 
         if ($last_two_data_points[0]->atr >= $last_two_data_points[1]->atr) {
             return 'down';

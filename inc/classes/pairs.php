@@ -110,7 +110,6 @@ class pairs {
     private static function setPairs() {
         foreach (glob(root . '/inc/classes/pairs/*.php') as $file) {
             if (!strstr($file, '_pair.php')) {
-
                 $class_name = basename($file, '.php');
                 /**@var _pair $class*/
                 $class = new $class_name();

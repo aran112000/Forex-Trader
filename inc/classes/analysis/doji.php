@@ -31,7 +31,7 @@ class doji extends _base_analysis {
         ];
 
         if (!empty($data) && isset($data[2])) {
-            $last_two_data_points = array_splice($data, -2);
+            $last_two_data_points = array_slice($data, -2);
 
             $prior = $last_two_data_points[0];
             $last = $last_two_data_points[1];

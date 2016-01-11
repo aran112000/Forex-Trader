@@ -5,8 +5,8 @@
  */
 final class _analysis {
 
-    const SECONDS_BETWEEN_ANALYSIS_PROCESSES = 1;
-    const MINIMUM_SCORE_TO_TRADE = 2;
+    const SECONDS_BETWEEN_ANALYSIS_PROCESSES = 15;
+    const MINIMUM_SCORE_TO_TRADE = 1;
 
     public $default_pair_data = []; // This will only be non-empty when running tests when it's populated with test data
 
@@ -30,9 +30,9 @@ final class _analysis {
                 while (true) {
                     $score_details = $this->doAnalysePair($pair);
 
-                    log::write($pair->getPairName() . ' pricing analysis details: ' . print_r($score_details, true), LOG::DEBUG);
+                    log::write($pair->getPairName() . ' pricing analysis details: ' . print_r($score_details, true), LOG::INFO);
                     if ($this->isEntrySignal($score_details)) {
-                        log::write($pair->getPairName() . ' - Signals show we\'re good to trade - Score: ' . $score_details['score'], LOG::DEBUG);
+                        log::write($pair->getPairName() . ' - Signals show we\'re good to trade - Score: ' . $score_details['score'], LOG::INFO);
                         socket::send('analysis_result', [
                             'pair' => $pair->getPairName(),
                             'score' => $score_details['score'],
@@ -46,6 +46,8 @@ final class _analysis {
                 }
             };
         }
+
+        new multi_process_manager('doAnalysePairs', $workers);
     }
 
     /**
@@ -93,29 +95,20 @@ final class _analysis {
             ],
             'details' => []
         ];
-        foreach ($this->analysis_methods as $test_class_name => $class) {
-            /**@var _base_analysis $class*/
-            $class->setPair($currency_pair);
-            $class->setData($this->default_pair_data); // Clear data cache (or populate with test data)
-            $score = $class->doAnalyse();
-            if (!is_array($score)) {
-                $tmp_score = $score;
-                $score = [
-                    'buy' => $tmp_score,
-                    'sell' => $tmp_score,
-                ];
-                unset($tmp_score);
-            }
-            $score_details['details'][] = [
-                'name' => ucwords(str_replace('_', ' ', $test_class_name)),
-                'score' => $score,
-            ];
-            if ($class->signal_strength == 'minor') {
-                $score_details['score']['buy'] += ($score['buy'] / 5);
-                $score_details['score']['sell'] += ($score['sell'] / 5);
-            } else {
-                $score_details['score']['buy'] += $score['buy'];
-                $score_details['score']['sell'] += $score['sell'];
+
+        if (!empty($this->analysis_methods)) {
+            foreach ($this->analysis_methods as $test_class_name => $class) {
+                /**@var _base_analysis $class*/
+                $class->setPair($currency_pair);
+                $class->setData($this->default_pair_data); // Clear data cache (or populate with test data)
+                $trade_details = $class->doAnalyse();
+
+                if (!empty($trade_details)) {
+                    $score_details['details'][] = [
+                        'name' => ucwords(str_replace('_', ' ', $test_class_name)),
+                        'trade_details' => $trade_details,
+                    ];
+                }
             }
         }
 
