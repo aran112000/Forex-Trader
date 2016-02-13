@@ -65,19 +65,19 @@ class bounces extends _base_analysis {
      */
     private function getTradeDetails(string $direction): array {
         $data = $this->getData();
-        $data = array_slice($data, -2);
+        $latest_day = end($data);
 
         if ($direction === 'long') {
             $type = 'Buy';
-            $entry = $data[0]->high + 0.0002;
-            $exit = $data[0]->low - 0.0002;
+            $entry = $latest_day->high + 0.0002;
+            $exit = $latest_day->low - 0.0002;
         } else {
             $type = 'Sell';
-            $entry = $data[0]->low - 0.0002;
-            $exit = $data[0]->high + 0.0002;
+            $entry = $latest_day->low - 0.0002;
+            $exit = $latest_day->high + 0.0002;
         }
 
-        $pip_difference = (($entry - $exit) * 10000);
+        $pip_difference = get::pip_difference($entry, $exit);
 
         $account = new account();
         $balance = $account->getBalance();
@@ -86,6 +86,7 @@ class bounces extends _base_analysis {
 
         return [
             'type' => $type,
+            'date_time' => $latest_day->date_time,
             'entry' => $entry,
             'exit' => $exit,
             'current_balance' => $balance,
@@ -172,54 +173,35 @@ class bounces extends _base_analysis {
      */
     protected function isLongEntry(): bool {
         $data = $this->getEmas();
-        /**@var avg_price_data $latest_day*/
         $latest_day = end($data);
 
-        $valid_signal = null;
-
-        // Look for a 20 EMA bounce
-        if ($latest_day->ema_20 <= $latest_day->ema_50) {
-            // 20 EMA is above 50 EMA
-            $valid_signal = false;
-        } else if ($latest_day->low >= $latest_day->ema_20) {
-            // Daily low is lower than the 20 EMA
-            $valid_signal = false;
-        } else if ($latest_day->open <= $latest_day->ema_20 && $latest_day->close <= $latest_day->ema_20) {
-            // Daily open and close price is higher than the 20 EMA
-            $valid_signal = false;
-        } else if ($this->getChoppinessIndex() >= 60) {
-            // The market is not choppy (Choppiness index is under 60)
-            $valid_signal = false;
-        } else if ($this->getAtrDirection() === 'up') {
-            // The market is not accelerating (ATR is pointing sideways or down)
-            $valid_signal = false;
-        } else {
-            $valid_signal = true;
-        }
-
-        if ($valid_signal === false) {
-            // Look for a 50 EMA bounce
-            if ($latest_day->ema_20 <= $latest_day->ema_50) {
-                // 20 EMA is above 50 EMA
-                $valid_signal = false;
-            } else if ($latest_day->low >= $latest_day->ema_50) {
-                // Daily low is lower than the 50 EMA
-                $valid_signal = false;
-            } else if ($latest_day->open <= $latest_day->ema_50 && $latest_day->close <= $latest_day->ema_50) {
-                // Daily open and close price is higher than the 20 EMA
-                $valid_signal = false;
-            } else if ($this->getChoppinessIndex() >= 60) {
-                // The market is not choppy (Choppiness index is under 60)
-                $valid_signal = false;
-            } else if ($this->getAtrDirection() === 'up') {
-                // The market is not accelerating (ATR is pointing sideways or down)
-                $valid_signal = false;
-            } else {
-                $valid_signal = true;
+        // Look for an 20 EMA bounce
+        if ($latest_day->ema_20 > $latest_day->ema_50) {
+            if ($latest_day->low < $latest_day->ema_20) {
+                if ($latest_day->open > $latest_day->ema_20 && $latest_day->close > $latest_day->ema_20) {
+                    if ($this->getChoppinessIndex() < 60) {
+                        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+                            return true;
+                        }
+                    }
+                }
             }
         }
 
-        return $valid_signal;
+        // Look for an 50 EMA bounce
+        if ($latest_day->ema_20 > $latest_day->ema_50) {
+            if ($latest_day->low < $latest_day->ema_50) {
+                if ($latest_day->open > $latest_day->ema_50 && $latest_day->close > $latest_day->ema_50) {
+                    if ($this->getChoppinessIndex() < 60) {
+                        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -227,53 +209,34 @@ class bounces extends _base_analysis {
      */
     protected function isShortEntry() {
         $data = $this->getEmas();
-        /**@var avg_price_data $latest_day */
         $latest_day = end($data);
 
-        $valid_signal = null;
-
-        // Look for a 20 EMA bounce
-        if ($latest_day->ema_20 >= $latest_day->ema_50) {
-            // 20 EMA is below 50 EMA
-            $valid_signal = false;
-        } else if ($latest_day->high <= $latest_day->ema_20) {
-            // Daily high is higher than the 20 EMA
-            $valid_signal = false;
-        } else if ($latest_day->open >= $latest_day->ema_20 && $latest_day->close >= $latest_day->ema_20) {
-            // Daily open and close price is lower than the 20 EMA
-            $valid_signal = false;
-        } else if ($this->getChoppinessIndex() >= 60) {
-            // The market is not choppy (Choppiness index is under 60)
-            $valid_signal = false;
-        } else if ($this->getAtrDirection() === 'up') {
-            // The market is not accelerating (ATR is pointing sideways or down)
-            $valid_signal = false;
-        } else {
-            $valid_signal = true;
-        }
-
-        if ($valid_signal === false) {
-            // Look for a 50 EMA bounce
-            if ($latest_day->ema_20 >= $latest_day->ema_50) {
-                // 20 EMA is below 50 EMA
-                $valid_signal = false;
-            } else if ($latest_day->high <= $latest_day->ema_50) {
-                // Daily high is higher than the 50 EMA
-                $valid_signal = false;
-            } else if ($latest_day->open >= $latest_day->ema_50 && $latest_day->close >= $latest_day->ema_50) {
-                // Daily open and close price is lower than the 50 EMA
-                $valid_signal = false;
-            } else if ($this->getChoppinessIndex() >= 60) {
-                // The market is not choppy (Choppiness index is under 60)
-                $valid_signal = false;
-            } else if ($this->getAtrDirection() === 'up') {
-                // The market is not accelerating (ATR is pointing sideways or down)
-                $valid_signal = false;
-            } else {
-                $valid_signal = true;
+        // Look for an 20 EMA bounce
+        if ($latest_day->ema_20 < $latest_day->ema_50) {
+            if ($latest_day->high > $latest_day->ema_20) {
+                if ($latest_day->open < $latest_day->ema_20 && $latest_day->close < $latest_day->ema_20) {
+                    if ($this->getChoppinessIndex() < 60) {
+                        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+                            return true;
+                        }
+                    }
+                }
             }
         }
 
-        return $valid_signal;
+        // Look for an 50 EMA bounce
+        if ($latest_day->ema_20 < $latest_day->ema_50) {
+            if ($latest_day->high > $latest_day->ema_50) {
+                if ($latest_day->open < $latest_day->ema_50 && $latest_day->close < $latest_day->ema_50) {
+                    if ($this->getChoppinessIndex() < 60) {
+                        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

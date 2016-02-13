@@ -11,47 +11,69 @@ class test_trader {
     /**
      *
      */
-    public function initTests() {
-        $aud_cad_class = new aud_cad();
-        $aud_cad_class->data_fetch_time = '1d';
-        $full_data_set = $aud_cad_class->getData((self::MAXIMUM_DATA_POINTS_TO_TEST + self::MINIMUM_DATA_POINTS_TO_TEST));
+    public function initSwingTradeAlerts() {
+        foreach (pairs::getPairs() as $pair) {
+            /**@var _pair $pair */
+            echo '<p>Processing ' . $pair->getPairName('/') . '</p>' . "\n";
+            flush();
 
-        $trades_inspected = 0;
-        $signals = 0;
-        $valid_trades = 0;
-
-        $i = 0;
-        foreach ($full_data_set as $key => $row) {
-            $i++;
-            if ($i >= self::MINIMUM_DATA_POINTS_TO_TEST && $i <= self::MAXIMUM_DATA_POINTS_TO_TEST) {
-                $trades_inspected++;
-                $test_data = array_slice($full_data_set, 0, $i);
-
-                $analysis = new _analysis();
-                $analysis->default_pair_data = $test_data;
-                $results = $analysis->doAnalysePair($aud_cad_class);
-                $trade_details = $results['details'];
-
-                if (!empty($trade_details)) {
-                    $signals++;
-                    $remaining_data = array_slice($full_data_set, ($key + 1), 150);
-
-                    $pip_difference = $this->doVerifyTrade($remaining_data, $trade_details[0]['trade_details']);
-                    if ($pip_difference > 0) {
-                        echo '<p>PIP: ' . $pip_difference . '</p>'."\n";
-                        $valid_trades++;
-                    }
-                }
-            } else if ($i > self::MAXIMUM_DATA_POINTS_TO_TEST) {
-                break;
-            }
+            $analysis = new _analysis();
+            $analysis->default_pair_data = $this->getSwingTradeData($pair);
+            $analysis->doAnalysePair($pair, function (array $score_details) {
+                echo '<p style="color:green;font-weight:bold;">Trade details: <pre>' . print_r($score_details, true) . '</pre></p>' . "\n";
+                flush();
+            });
         }
+    }
 
-        echo '<h1>Results</h1>'."\n";
-        echo '<p>Total: ' . $trades_inspected . '</p>'."\n";
-        echo '<p>Signals: ' . $signals . '</p>'."\n";
-        echo '<p>Valid trades: ' . $valid_trades . '</p>'."\n";
-        echo '<p>Success percentage: ' . round((($valid_trades / $signals) * 100), 2) . '%</p>'."\n";
+    /* OLD CODE BELOW HERE */
+
+    /**
+     *
+     */
+    public function initTests() {
+        foreach (pairs::getPairs() as $pair) {
+            /**@var _pair $pair*/
+            $pair->data_fetch_time = 'D';
+            $full_data_set = $pair->getData((self::MAXIMUM_DATA_POINTS_TO_TEST + self::MINIMUM_DATA_POINTS_TO_TEST));
+
+            $trades_inspected = 0;
+            $signals = 0;
+            $valid_trades = 0;
+
+            $i = 0;
+            foreach ($full_data_set as $key => $row) {
+                $i++;
+                if ($i >= self::MINIMUM_DATA_POINTS_TO_TEST && $i <= self::MAXIMUM_DATA_POINTS_TO_TEST) {
+                    $trades_inspected++;
+                    $test_data = array_slice($full_data_set, 0, $i);
+
+                    $analysis = new _analysis();
+                    $analysis->default_pair_data = $test_data;
+                    $results = $analysis->doScorePair($pair);
+                    $trade_details = $results['entries'];
+
+                    if (!empty($trade_details)) {
+                        $signals++;
+                        $remaining_data = array_slice($full_data_set, ($key + 1), 150);
+
+                        $pip_difference = $this->doVerifyTrade($remaining_data, $trade_details[0]['entry_details']);
+                        if ($pip_difference != 0) {
+                            echo '<p>' . $pip_difference . '</p>' . "\n";
+                            $valid_trades++;
+                        }
+                    }
+                } else if ($i > self::MAXIMUM_DATA_POINTS_TO_TEST) {
+                    break;
+                }
+            }
+
+            echo '<h1>Results</h1>' . "\n";
+            echo '<p>Total: ' . $trades_inspected . '</p>' . "\n";
+            echo '<p>Signals: ' . $signals . '</p>' . "\n";
+            echo '<p>Valid trades: ' . $valid_trades . '</p>' . "\n";
+            echo '<p>Success percentage: ' . round((($valid_trades / $signals) * 100), 2) . '%</p>' . "\n";
+        }
     }
 
     /**
@@ -61,17 +83,17 @@ class test_trader {
      * @return float
      */
     private function doVerifyTrade(array $future_data, array $trade_details): float {
-        $entry_price = 0;
+        $trading = null;
 
         foreach ($future_data as $key => $data) {
             /**@var avg_price_data $data */
-            if ($entry_price === 0) {
+            if ($trading === null) {
                 if ($trade_details['type'] == 'Buy' && $data->close >= $trade_details['entry']) {
                     // Buy order was triggered
-                    $entry_price = $trade_details['entry'];
+                    $trading = true;
                 } else if ($trade_details['type'] == 'Sell' && $data->close <= $trade_details['entry']) {
                     // Sell order was triggered
-                    $entry_price = $trade_details['entry'];
+                    $trading = true;
                 } else {
                     // Trade wasn't entered this time :(
                     return 0;
@@ -79,11 +101,13 @@ class test_trader {
             } else {
                 // Trade has begun, continue tracking until we hit our stop loss
                 if ($trade_details['type'] == 'Buy' && $data->low <= $trade_details['exit']) {
+
                     // Stop loss hit
-                    return get::pip_difference($data->low, $entry_price);
+                    return get::pip_difference($trade_details['exit'], $trade_details['entry']);
                 } else if ($trade_details['type'] == 'Sell' && $data->low >= $trade_details['exit']) {
+
                     // Stop loss hit
-                    return get::pip_difference($trade_details['entry'], $entry_price);
+                    return get::pip_difference($trade_details['exit'], $trade_details['entry']);
                 } else {
                     // Still trading nicely, increase our stop loss
                     $position_size = abs($trade_details['entry'] - $trade_details['exit']);

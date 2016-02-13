@@ -10,7 +10,7 @@ abstract class _pair {
     public $base_currency  = null;
     public $quote_currency = null;
 
-    public $data_fetch_time = '1m';
+    public $data_fetch_time = 'M1';
 
     /**
      * _pair constructor.
@@ -30,35 +30,41 @@ abstract class _pair {
 
     /**
      * @param int    $limit
-     * @param string $order
      *
      * @return mixed
      */
-    public function getData(int $limit = 20, $order = 'DESC'): array {
-        $return = [];
+    public function getData(int $limit = 20) {
+        $result = [];
 
-        $pair = $this->base_currency . '_' . $this->quote_currency;
-        if ($res = db::query('SELECT * FROM pricing_' . $this->data_fetch_time . ' WHERE pair=\'' . db::esc($pair) . '\' ORDER BY timekey ' . strtoupper($order) . ' LIMIT ' . $limit)) {
-            while ($row = db::fetch($res)) {
-                $class = new avg_price_data();
-                $class->pair = $pair;
-                $class->timekey = $row['timekey'];
-                $class->entry_time = $row['entry_time'];
-                $class->exit_time = $row['exit_time'];
-                $class->open = $row['open'];
-                $class->close = $row['close'];
-                $class->high = $row['high'];
-                $class->low = $row['low'];
-                $class->volume = $row['volume'];
+        $oanda = new oanda_rest_api();
+        if ($response = $oanda->doApiRequest('candles', [
+            'instrument' => $this->getPairName(),
+            'granularity' => $this->data_fetch_time,
+            'count' => $limit
+        ], 'GET')
+        ) {
+            if (!empty($response['candles'])) {
+                foreach ($response['candles'] as $row) {
+                    if ($row['complete']) {
+                        $class = new avg_price_data();
+                        $class->pair = $this;
+                        $class->time = substr($row['time'], 0, 10);
+                        $class->date_time = date('d/m/Y H:i:s', $class->time);
+                        $class->open = $row['openBid'];
+                        $class->close = $row['closeBid'];
+                        $class->high = $row['highBid'];
+                        $class->low = $row['lowBid'];
+                        $class->volume = $row['volume'];
 
-                $return[] = $class;
+                        $result[] = $class;
+                    } else {
+                        echo '<p>Non-complete day skipped...</p>' . "\n";
+                    }
+                }
             }
-
-            // Due to the limit we need to now reverse the order of our data so the newest is at the end
-            $return = array_reverse($return);
         }
 
-        return $return;
+        return $result;
     }
 
     /**

@@ -63,19 +63,19 @@ class power_trends extends _base_analysis {
      */
     private function getTradeDetails(string $direction): array {
         $data = $this->getData();
-        $data = array_slice($data, -2);
+        $latest_day = end($data);
 
         if ($direction === 'long') {
             $type = 'Buy';
-            $entry = $data[0]->high + 0.0002;
-            $exit = $data[0]->low - 0.0002;
+            $entry = $latest_day->high + 0.0002;
+            $exit = $latest_day->low - 0.0002;
         } else {
             $type = 'Sell';
-            $entry = $data[0]->low - 0.0002;
-            $exit = $data[0]->high + 0.0002;
+            $entry = $latest_day->low - 0.0002;
+            $exit = $latest_day->high + 0.0002;
         }
 
-        $pip_difference = (($entry - $exit) * 10000);
+        $pip_difference = get::pip_difference($entry, $exit);
 
         $account = new account();
         $balance = $account->getBalance();
@@ -84,6 +84,7 @@ class power_trends extends _base_analysis {
 
         return [
             'type' => $type,
+            'date_time' => $latest_day->date_time,
             'entry' => $entry,
             'exit' => $exit,
             'current_balance' => $balance,
@@ -168,26 +169,21 @@ class power_trends extends _base_analysis {
      */
     protected function isLongEntry(): bool {
         $data = $this->getEmas();
-        /**@var avg_price_data $latest_day*/
         $latest_day = end($data);
 
-        if ($latest_day->ema_3 <= $latest_day->ema_7) {
-            return false;
-        }
-        if ($latest_day->ema_7 <= $latest_day->ema_50) {
-            return false;
-        }
-        if ($latest_day->getDirection() !== 'down') {
-            return false;
-        }
-        if ($this->getChoppinessIndex() >= 60) {
-            return false;
-        }
-        if ($this->getAtrDirection() !== 'down') {
-            return false;
+        if ($latest_day->ema_3 > $latest_day->ema_7) {
+            if ($latest_day->ema_7 > $latest_day->ema_50) {
+                if ($latest_day->getDirection() === 'down' || $latest_day->getDirection() === 'neutral') {
+                    if ($this->getChoppinessIndex() < 60) {
+                        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+                            return true;
+                        }
+                    }
+                }
+            }
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -195,25 +191,20 @@ class power_trends extends _base_analysis {
      */
     protected function isShortEntry() {
         $data = $this->getEmas();
-        /**@var avg_price_data $latest_day */
         $latest_day = end($data);
 
-        if ($latest_day->ema_3 >= $latest_day->ema_7) {
-            return false;
-        }
-        if ($latest_day->ema_7 >= $latest_day->ema_50) {
-            return false;
-        }
-        if ($latest_day->getDirection() !== 'up') {
-            return false;
-        }
-        if ($this->getChoppinessIndex() >= 60) {
-            return false;
-        }
-        if ($this->getAtrDirection() !== 'up') {
-            return false;
+        if ($latest_day->ema_3 < $latest_day->ema_7) {
+            if ($latest_day->ema_7 < $latest_day->ema_50) {
+                if ($latest_day->getDirection() === 'up' || $latest_day->getDirection() === 'neutral') {
+                    if ($this->getChoppinessIndex() < 60) {
+                        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+                            return true;
+                        }
+                    }
+                }
+            }
         }
 
-        return true;
+        return false;
     }
 }

@@ -8,9 +8,16 @@ final class _analysis {
     const SECONDS_BETWEEN_ANALYSIS_PROCESSES = 15;
     const MINIMUM_SCORE_TO_TRADE = 1;
 
-    public $default_pair_data = []; // This will only be non-empty when running tests when it's populated with test data
-
     private $analysis_methods = null;
+
+    /**
+     * @var array
+     *
+     * This array should be populated in chronological order. The oldest at the start, and the newest at the end
+     *
+     * Note: This will only be non-empty when running tests when it's populated with test data
+     */
+    public $default_pair_data = [];
 
     /**
      * analysis constructor.
@@ -28,19 +35,7 @@ final class _analysis {
             /**@var _pair $pair*/
             $workers[] = function() use ($pair, $trade_function) {
                 while (true) {
-                    $score_details = $this->doAnalysePair($pair);
-
-                    log::write($pair->getPairName() . ' pricing analysis details: ' . print_r($score_details, true), LOG::INFO);
-                    if ($this->isEntrySignal($score_details)) {
-                        log::write($pair->getPairName() . ' - Signals show we\'re good to trade - Score: ' . $score_details['score'], LOG::INFO);
-                        socket::send('analysis_result', [
-                            'pair' => $pair->getPairName(),
-                            'score' => $score_details['score'],
-                            'details' => $score_details,
-                        ]);
-
-                        call_user_func($trade_function, $pair);
-                    }
+                    $this->doAnalysePair($pair, $trade_function);
 
                     sleep(self::SECONDS_BETWEEN_ANALYSIS_PROCESSES);
                 }
@@ -55,20 +50,23 @@ final class _analysis {
      */
     public function doAnalysePairs(callable $trade_function) {
         foreach (pairs::getPairs() as $pair) {
-            /**@var _pair $pair*/
-            $score_details = $this->doAnalysePair($pair);
+            $this->doAnalysePair($pair, $trade_function);
+        }
+    }
 
-            log::write($pair->getPairName() . ' pricing analysis details: ' . print_r($score_details, true), LOG::DEBUG);
-            if ($this->isEntrySignal($score_details)) {
-                log::write($pair->getPairName() . ' - Signals show we\'re good to trade - Score: ' . $score_details['score'], LOG::DEBUG);
-                socket::send('analysis_result', [
-                    'pair' => $pair->getPairName(),
-                    'score' => $score_details['score'],
-                    'details' => $score_details,
-                ]);
+    public function doAnalysePair(_pair $pair, callable $trade_function) {
+        $score_details = $this->doScorePair($pair);
 
-                call_user_func($trade_function, $pair);
-            }
+        log::write($pair->getPairName() . ' pricing analysis details: ' . print_r($score_details, true), log::DEBUG);
+        if ($this->isEntrySignal($score_details)) {
+            log::write($pair->getPairName() . ' - Signals show we have an entry', log::DEBUG);
+            socket::send('analysis_result', [
+                'pair' => $pair->getPairName(),
+                'entry' => $score_details['entries'],
+                'details' => $score_details,
+            ]);
+
+            call_user_func($trade_function, $score_details);
         }
     }
 
@@ -78,7 +76,7 @@ final class _analysis {
      * @return bool
      */
     public function isEntrySignal(array $score_details): bool {
-        return ($score_details['score']['buy'] >= self::MINIMUM_SCORE_TO_TRADE || $score_details['score']['sell'] >= self::MINIMUM_SCORE_TO_TRADE);
+        return $score_details['entries'] !== [];
     }
 
     /**
@@ -86,14 +84,10 @@ final class _analysis {
      *
      * @return array
      */
-    public function doAnalysePair(_pair $currency_pair): array {
+    public function doScorePair(_pair $currency_pair): array {
         $score_details = [
             'pair' => $currency_pair->getPairName(),
-            'score' => [
-                'buy' => 0,
-                'sell' => 0,
-            ],
-            'details' => []
+            'entries' => []
         ];
 
         if (!empty($this->analysis_methods)) {
@@ -104,9 +98,9 @@ final class _analysis {
                 $trade_details = $class->doAnalyse();
 
                 if (!empty($trade_details)) {
-                    $score_details['details'][] = [
+                    $score_details['entries'][] = [
                         'name' => ucwords(str_replace('_', ' ', $test_class_name)),
-                        'trade_details' => $trade_details,
+                        'entry_details' => $trade_details,
                     ];
                 }
             }

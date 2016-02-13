@@ -2,13 +2,13 @@
 require('inc/bootstrap.php');
 
 $tasks = [
-    'fetchRates' => function() {
+    'fetch_live_rates' => function() {
         pairs::getPricingFeed();
     },
-    'trader' => function() {
+    /*'day_trader' => function() {
         $trader = new trader();
         $trader->initRealtimeTrading();
-    }
+    },*/
 ];
 
 new multi_process_manager('Server', $tasks);
