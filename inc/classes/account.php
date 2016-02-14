@@ -23,6 +23,23 @@ final class account {
     }
 
     /**
+     * This is only to be used for backtesting
+     *
+     * @param float $new_balance
+     *
+     * @return bool
+     */
+    public static function setBalance(float $new_balance): bool {
+        if (defined('testing') && testing) {
+            self::$balance = $new_balance;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      *
      */
     private static function setAccountDetails() {

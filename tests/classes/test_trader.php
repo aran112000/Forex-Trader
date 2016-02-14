@@ -5,106 +5,116 @@
  */
 class test_trader {
 
-    const MAXIMUM_DATA_POINTS_TO_TEST = 4500;
+    const MINIMUM_DATA_POINTS_TO_TEST = 50;
+    const MAXIMUM_DATA_POINTS_TO_TEST = (1 * 365);
     const PAIRS_TO_TEST = 30;
 
     /**
      *
      */
     public function initTests() {
-        $total_trades_inspected = 0;
-        $total_signals = 0;
+        $total_candles_inspected = 0;
+        $total_entries = 0;
         $total_valid_trades = 0;
         $total_wins = 0;
         $total_losses = 0;
-        $total_percentage_gain = 0;
+        $start_balance = account::getBalance();
 
         $pair_i = 0;
+
+        echo '<h1>Starting account balance: &#163;' . number_format($start_balance, 2) . '</h1>' . "\n";
+
         foreach (pairs::getPairs() as $pair) {
             $pair_i++;
 
+            $pair_start_balance = account::getBalance();
+
             /**@var _pair $pair*/
             $pair->data_fetch_time = 'D';
-            $full_data_set = $pair->getData((self::MAXIMUM_DATA_POINTS_TO_TEST));
+            $full_data_set = $pair->getData((self::MAXIMUM_DATA_POINTS_TO_TEST + self::MINIMUM_DATA_POINTS_TO_TEST));
 
             $candles_inspected = 0;
             $entries = 0;
             $valid_trades = 0;
             $wins = 0;
             $losses = 0;
-            $gain = 0;
-            $percentage_gain = 0;
+            $trade_percentage_gain = 0;
 
             $i = 0;
             foreach ($full_data_set as $key => $row) {
                 $i++;
-                $candles_inspected++;
-                $test_data = array_slice($full_data_set, 0, $i);
+                if ($i >= self::MINIMUM_DATA_POINTS_TO_TEST && $i < (self::MAXIMUM_DATA_POINTS_TO_TEST + self::MINIMUM_DATA_POINTS_TO_TEST)) {
+                    $candles_inspected++;
+                    $test_data = array_slice($full_data_set, 0, $i);
 
-                $analysis = new _analysis();
-                $analysis->default_pair_data = $test_data;
-                $results = $analysis->doScorePair($pair);
-                $trade_details = $results['entries'];
+                    $analysis = new _analysis();
+                    $analysis->default_pair_data = $test_data;
+                    $results = $analysis->doScorePair($pair);
+                    $trade_details = $results['entries'];
 
-                if (!empty($trade_details)) {
-                    $remaining_data = array_slice($full_data_set, ($key + 1), 150);
+                    if (!empty($trade_details)) {
+                        $remaining_data = array_slice($full_data_set, ($key + 1), 150);
 
-                    foreach ($trade_details as $trade) {
-                        $entries++;
-                        if ($results = $this->doVerifyTrade($remaining_data, $trade['entry_details'])) {
-                            $pip_difference = $results['pip_gain'];
-
-                            if ($pip_difference != 0) {
+                        foreach ($trade_details as $trade) {
+                            $entries++;
+                            if ($results = $this->doVerifyTrade($remaining_data, $trade['entry_details'])) {
                                 $valid_trades++;
+                                $pip_gain = $results['pip_gain'];
 
-                                if ($pip_difference > 0) {
+                                if ($pip_gain > 0) {
                                     $wins++;
-                                    $percentage_gain += $results['percentage_gain'];
-                                    $gain += $results['gain'];
-                                } else if ($pip_difference < 0) {
+                                    $trade_percentage_gain += $results['percentage_gain'];
+                                } else if ($pip_gain < 0) {
                                     $losses++;
-                                    $percentage_gain += $results['percentage_gain'];
-                                    $gain += $results['gain'];
+                                    $trade_percentage_gain += $results['percentage_gain'];
                                 }
+
+                                account::setBalance(((account::getBalance() / 100) * $results['percentage_gain']) + account::getBalance());
                             }
                         }
                     }
                 }
             }
 
+            $pair_end_balance = account::getBalance();
+            $pair_gross_profit = ((($pair_end_balance - $pair_start_balance) / $pair_start_balance) * 100);
+
             echo '<div style="display:block;width:16.5%;float:left;margin:.08%;padding:.75%;box-sizing:border-box;border:1px solid #ccc;">';
-                echo '<h1 style="margin:0 0 15px 0;">' . $pair->getPairName('/') . ' Results</h1>' . "\n";
-                echo '<p style="padding: 0 0 5px 0;margin:0">Daily candles analysed: ' . number_format($candles_inspected) . ' (' . number_format(($candles_inspected / 365), 1) . ' Yrs)</p>' . "\n";
-                echo '<p style="padding: 0 0 5px 0;margin:0">Trades entries identified: ' . $entries . '</p>' . "\n";
-                echo '<p style="padding: 0 0 5px 0;margin:0">Entries triggered: ' . $valid_trades . ' (' . round((($valid_trades / $entries) * 100), 2) . '%)</p>' . "\n";
-                echo '<p style="padding: 0 0 5px 0;margin:0">Winning trades: ' . $wins . ' (' . round((($wins / $valid_trades) * 100), 2) . '%)</p>' . "\n";
-                echo '<p style="padding: 0 0 5px 0;margin:0">Loosing trades: ' . $losses . '</p>' . "\n";
-                echo '<p style="padding: 0 0 5px 0;margin:0">Percentage gain: ' . number_format($percentage_gain, 2) . '%</p>' . "\n";
+                echo '<h1 style="margin:0 0 10px 0;">' . $pair->getPairName('/') . ' Results</h1>' . "\n";
+                echo '<p style="padding: 0 0 3px 0;margin:0">Daily candles analysed: ' . number_format($candles_inspected) . ' (' . number_format(($candles_inspected / 365), 1) . ' Yrs)</p>' . "\n";
+                echo '<p style="padding: 0 0 3px 0;margin:0">Entries identified: ' . $entries . ' (' . round((($entries / $candles_inspected) * 100), 2) . '%)</p>' . "\n";
+                echo '<p style="padding: 0 0 3px 0;margin:0">Entries triggered: ' . $valid_trades . ' (' . round((($valid_trades / $entries) * 100), 2) . '%)</p>' . "\n";
+                echo '<p style="padding: 0 0 3px 0;margin:0">Winning trades: ' . $wins . ' (' . round((($wins / $valid_trades) * 100), 2) . '%)</p>' . "\n";
+                echo '<p style="padding: 0 0 3px 0;margin:0">Loosing trades: ' . $losses . ' (' . round((($losses / $valid_trades) * 100), 2) . '%)</p>' . "\n";
+                echo '<p style="padding: 0 0 3px 0;margin:0">Gross profit: ' . number_format($pair_gross_profit, 2) . '%</p>' . "\n";
             echo '</div>';
 
-            $total_trades_inspected += $candles_inspected;
-            $total_signals += $entries;
+            $total_candles_inspected += $candles_inspected;
+            $total_entries += $entries;
             $total_valid_trades += $valid_trades;
             $total_wins += $wins;
             $total_losses += $losses;
-            $total_percentage_gain += $percentage_gain;
 
             if ($pair_i === self::PAIRS_TO_TEST) {
                 break;
             }
         }
 
-        echo '<div style="display:block;width:99.7%;float:left;margin:.15%;padding:.75%;box-sizing:border-box;border:1px solid #ccc;color:red;">';
-            echo '<h1 style="color:red;margin:0 0 15px 0;">Results Summary</h1>' . "\n";
-            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total days analysed: ' . number_format($total_trades_inspected) . '</p>' . "\n";
-            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total Trades placed: ' . number_format($total_signals) . '</p>' . "\n";
-            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total Trades triggered: ' . number_format($total_valid_trades) . '</p>' . "\n";
-            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total Entry trigger percentage: ' . round((($total_valid_trades / $total_signals) * 100), 2) . '%</p>' . "\n";
-            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total winning trades: ' . number_format($total_wins) . '</p>' . "\n";
-            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total loosing trades: ' . number_format($total_losses) . '</p>' . "\n";
-            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total Winning trade percentage: ' . round((($total_wins / $total_valid_trades) * 100), 2) . '%</p>' . "\n";
-            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total percentage gain: ' . number_format($total_percentage_gain, 2) . '%</p>' . "\n";
+        $end_balance = account::getBalance();
+        $total_gross_profit = ((($end_balance - $start_balance) / $start_balance) * 100);
+
+        echo '<div style="display:block;width:99.7%;clear:both;margin:.15%;padding:.75%;box-sizing:border-box;border:1px solid #ccc;color:red;">';
+            echo '<h1 style="color:red;margin:0 0 10px 0;">Results Summary</h1>' . "\n";
+            echo '<p style="color:red;padding: 0 0 3px 0;margin:0">Daily candles analysed: ' . number_format($total_candles_inspected) . '</p>' . "\n";
+            echo '<p style="color:red;padding: 0 0 3px 0;margin:0">Entries identified: ' . $total_entries . ' (' . round((($total_entries / $total_candles_inspected) * 100), 2) . '%)</p>' . "\n";
+            echo '<p style="color:red;padding: 0 0 3px 0;margin:0">Entries triggered: ' . $total_valid_trades . ' (' . round((($total_valid_trades / $total_entries) * 100), 2) . '%)</p>' . "\n";
+            echo '<p style="color:red;padding: 0 0 3px 0;margin:0">Winning trades: ' . $total_wins . ' (' . round((($total_wins / $total_valid_trades) * 100), 2) . '%)</p>' . "\n";
+            echo '<p style="color:red;padding: 0 0 3px 0;margin:0">Loosing trades: ' . $total_losses . ' (' . round((($total_losses / $total_valid_trades) * 100), 2) . '%)</p>' . "\n";
+            echo '<p style="color:red;padding: 0 0 3px 0;margin:0">Gross profit: ' . number_format($total_gross_profit, 2) . '%</p>' . "\n";
         echo '</div>';
+
+        echo '<h1>Closing account balance: &#163;' . number_format($end_balance, 2) . '</h1>' . "\n";
+        echo '<h1>Gross profit: &#163;' . number_format($end_balance - $start_balance, 2) . '</h1>' . "\n";
     }
 
     /**
