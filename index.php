@@ -1,6 +1,5 @@
 <?php
 require('inc/bootstrap.php');
-$account = new account();
 ?>
 
 <!DOCTYPE html>
@@ -16,7 +15,7 @@ $account = new account();
 if (!isset($_REQUEST['data'])) {
 ?>
 <h1>AUD/CAD</h1>
-<h2>Current account balance: &#163;<?= number_format($account->getBalance(), 4) ?></h2>
+<h2>Current account balance: &#163;<?= number_format(account::getBalance(), 4) ?></h2>
 <script src="http://192.168.1.95:8081/socket.io/socket.io.js"></script>
 <script>
     var socket = io('http://192.168.1.95:8081');

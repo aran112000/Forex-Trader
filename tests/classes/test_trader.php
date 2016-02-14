@@ -6,123 +6,171 @@
 class test_trader {
 
     const MINIMUM_DATA_POINTS_TO_TEST = 50;
-    const MAXIMUM_DATA_POINTS_TO_TEST = 1000;
+    const MAXIMUM_DATA_POINTS_TO_TEST = 4500;
 
-    /**
-     *
-     */
-    public function initSwingTradeAlerts() {
-        foreach (pairs::getPairs() as $pair) {
-            /**@var _pair $pair */
-            echo '<p>Processing ' . $pair->getPairName('/') . '</p>' . "\n";
-            flush();
-
-            $analysis = new _analysis();
-            $analysis->default_pair_data = $this->getSwingTradeData($pair);
-            $analysis->doAnalysePair($pair, function (array $score_details) {
-                echo '<p style="color:green;font-weight:bold;">Trade details: <pre>' . print_r($score_details, true) . '</pre></p>' . "\n";
-                flush();
-            });
-        }
-    }
-
-    /* OLD CODE BELOW HERE */
+    const PAIRS_TO_TEST = 30;
 
     /**
      *
      */
     public function initTests() {
+        $total_trades_inspected = 0;
+        $total_signals = 0;
+        $total_valid_trades = 0;
+        $total_wins = 0;
+        $total_losses = 0;
+        $total_percentage_gain = 0;
+
+        $pair_i = 0;
         foreach (pairs::getPairs() as $pair) {
+            $pair_i++;
+
             /**@var _pair $pair*/
             $pair->data_fetch_time = 'D';
             $full_data_set = $pair->getData((self::MAXIMUM_DATA_POINTS_TO_TEST + self::MINIMUM_DATA_POINTS_TO_TEST));
 
-            $trades_inspected = 0;
-            $signals = 0;
+            $candles_inspected = 0;
+            $entries = 0;
             $valid_trades = 0;
+            $wins = 0;
+            $losses = 0;
+            $gain = 0;
+            $percentage_gain = 0;
 
             $i = 0;
             foreach ($full_data_set as $key => $row) {
                 $i++;
-                if ($i >= self::MINIMUM_DATA_POINTS_TO_TEST && $i <= self::MAXIMUM_DATA_POINTS_TO_TEST) {
-                    $trades_inspected++;
-                    $test_data = array_slice($full_data_set, 0, $i);
+                $candles_inspected++;
+                $test_data = array_slice($full_data_set, 0, $i);
 
-                    $analysis = new _analysis();
-                    $analysis->default_pair_data = $test_data;
-                    $results = $analysis->doScorePair($pair);
-                    $trade_details = $results['entries'];
+                $analysis = new _analysis();
+                $analysis->default_pair_data = $test_data;
+                $results = $analysis->doScorePair($pair);
+                $trade_details = $results['entries'];
 
-                    if (!empty($trade_details)) {
-                        $signals++;
-                        $remaining_data = array_slice($full_data_set, ($key + 1), 150);
+                if (!empty($trade_details)) {
+                    $remaining_data = array_slice($full_data_set, ($key + 1), 150);
 
-                        $pip_difference = $this->doVerifyTrade($remaining_data, $trade_details[0]['entry_details']);
-                        if ($pip_difference != 0) {
-                            echo '<p>' . $pip_difference . '</p>' . "\n";
-                            $valid_trades++;
+                    foreach ($trade_details as $trade) {
+                        $entries++;
+                        if ($results = $this->doVerifyTrade($remaining_data, $trade['entry_details'])) {
+                            $pip_difference = $results['pip_gain'];
+
+                            if ($pip_difference != 0) {
+                                $valid_trades++;
+
+                                if ($pip_difference > 0) {
+                                    $wins++;
+                                    $percentage_gain += $results['percentage_gain'];
+                                    $gain += $results['gain'];
+                                } else if ($pip_difference < 0) {
+                                    $losses++;
+                                    $percentage_gain += $results['percentage_gain'];
+                                    $gain += $results['gain'];
+                                }
+                            }
                         }
                     }
-                } else if ($i > self::MAXIMUM_DATA_POINTS_TO_TEST) {
-                    break;
                 }
             }
 
-            echo '<h1>Results</h1>' . "\n";
-            echo '<p>Total: ' . $trades_inspected . '</p>' . "\n";
-            echo '<p>Signals: ' . $signals . '</p>' . "\n";
-            echo '<p>Valid trades: ' . $valid_trades . '</p>' . "\n";
-            echo '<p>Success percentage: ' . round((($valid_trades / $signals) * 100), 2) . '%</p>' . "\n";
+            echo '<div style="display:block;width:16.5%;float:left;margin:.08%;padding:.75%;box-sizing:border-box;border:1px solid #ccc;">';
+                echo '<h1 style="margin:0 0 15px 0;">' . $pair->getPairName('/') . ' Results</h1>' . "\n";
+                echo '<p style="padding: 0 0 5px 0;margin:0">Daily candles analysed: ' . number_format($candles_inspected) . ' (' . number_format(($candles_inspected / 365), 2) . ' Years)</p>' . "\n";
+                echo '<p style="padding: 0 0 5px 0;margin:0">Trades entries identified: ' . $entries . '</p>' . "\n";
+                echo '<p style="padding: 0 0 5px 0;margin:0">Entries triggered: ' . $valid_trades . ' (' . round((($valid_trades / $entries) * 100), 2) . '%)</p>' . "\n";
+                echo '<p style="padding: 0 0 5px 0;margin:0">Winning trades: ' . $wins . ' (' . round((($wins / $valid_trades) * 100), 2) . '%)</p>' . "\n";
+                echo '<p style="padding: 0 0 5px 0;margin:0">Loosing trades: ' . $losses . '</p>' . "\n";
+                echo '<p style="padding: 0 0 5px 0;margin:0">Percentage gain: ' . number_format($percentage_gain, 2) . '%</p>' . "\n";
+            echo '</div>';
+
+            $total_trades_inspected += $candles_inspected;
+            $total_signals += $entries;
+            $total_valid_trades += $valid_trades;
+            $total_wins += $wins;
+            $total_losses += $losses;
+            $total_percentage_gain += $percentage_gain;
+
+            if ($pair_i === self::PAIRS_TO_TEST) {
+                break;
+            }
         }
+
+        echo '<div style="display:block;width:99.7%;float:left;margin:.15%;padding:.75%;box-sizing:border-box;border:1px solid #ccc;color:red;">';
+            echo '<h1 style="color:red;margin:0 0 15px 0;">Results Summary</h1>' . "\n";
+            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total days analysed: ' . number_format($total_trades_inspected) . '</p>' . "\n";
+            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total Trades placed: ' . number_format($total_signals) . '</p>' . "\n";
+            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total Trades triggered: ' . number_format($total_valid_trades) . '</p>' . "\n";
+            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total Entry trigger percentage: ' . round((($total_valid_trades / $total_signals) * 100), 2) . '%</p>' . "\n";
+            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total winning trades: ' . number_format($total_wins) . '</p>' . "\n";
+            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total loosing trades: ' . number_format($total_losses) . '</p>' . "\n";
+            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total Winning trade percentage: ' . round((($total_wins / $total_valid_trades) * 100), 2) . '%</p>' . "\n";
+            echo '<p style="color:red;padding: 0 0 5px 0;margin:0">Total percentage gain: ' . number_format($total_percentage_gain, 2) . '%</p>' . "\n";
+        echo '</div>';
     }
 
     /**
      * @param array $future_data
      * @param array $trade_details
      *
-     * @return float
+     * @return array|bool
      */
-    private function doVerifyTrade(array $future_data, array $trade_details): float {
+    private function doVerifyTrade(array $future_data, array $trade_details) {
         $trading = null;
 
-        foreach ($future_data as $key => $data) {
-            /**@var avg_price_data $data */
+        foreach ($future_data as $future_data) {
+            /**@var avg_price_data $future_data */
             if ($trading === null) {
-                if ($trade_details['type'] == 'Buy' && $data->close >= $trade_details['entry']) {
+                if ($trade_details['type'] === 'Buy' && $future_data->close >= $trade_details['entry']) {
                     // Buy order was triggered
                     $trading = true;
-                } else if ($trade_details['type'] == 'Sell' && $data->close <= $trade_details['entry']) {
+                } else if ($trade_details['type'] === 'Sell' && $future_data->close <= $trade_details['entry']) {
                     // Sell order was triggered
                     $trading = true;
                 } else {
                     // Trade wasn't entered this time :(
-                    return 0;
+                    return false;
                 }
             } else {
                 // Trade has begun, continue tracking until we hit our stop loss
-                if ($trade_details['type'] == 'Buy' && $data->low <= $trade_details['exit']) {
+                if ($trade_details['type'] === 'Buy' && $future_data->low <= $trade_details['stop']) {
+
+                    $gain = ($trade_details['stop'] * $trade_details['amount']) - ($trade_details['entry'] * $trade_details['amount']);
 
                     // Stop loss hit
-                    return get::pip_difference($trade_details['exit'], $trade_details['entry']);
-                } else if ($trade_details['type'] == 'Sell' && $data->low >= $trade_details['exit']) {
+                    return [
+                        'pip_gain' => get::pip_difference($trade_details['stop'], $trade_details['entry'], false),
+                        'gain' => round($gain, 3),
+                        'percentage_gain' => round(($gain / ($trade_details['entry'] * $trade_details['amount']) * 100), 4),
+                    ];
+                } else if ($trade_details['type'] === 'Sell' && $future_data->high >= $trade_details['stop']) {
+
+                    $gain = ($trade_details['entry'] * $trade_details['amount']) - ($trade_details['stop'] * $trade_details['amount']);
 
                     // Stop loss hit
-                    return get::pip_difference($trade_details['exit'], $trade_details['entry']);
+                    return [
+                        'pip_gain' => get::pip_difference($trade_details['entry'], $trade_details['stop'], false),
+                        'gain' => round($gain, 3),
+                        'percentage_gain' => round(($gain / ($trade_details['stop'] * $trade_details['amount']) * 100), 4),
+                    ];
                 } else {
                     // Still trading nicely, increase our stop loss
-                    $position_size = abs($trade_details['entry'] - $trade_details['exit']);
-
-                    // Move our stop loss
-                    if ($trade_details['type'] == 'Buy') {
-                        $trade_details['exit'] = $data->close - $position_size;
-                    } else if ($trade_details['type'] == 'Sell') {
-                        $trade_details['exit'] = $data->close + $position_size;
+                    if ($trade_details['type'] === 'Buy') {
+                        $new_stop = $future_data->low - 0.0002;
+                        if ($new_stop > $trade_details['stop']) {
+                            $trade_details['stop'] = $new_stop;
+                        }
+                    } else if ($trade_details['type'] === 'Sell') {
+                        $new_stop = $future_data->high + 0.0002;
+                        if ($new_stop < $trade_details['stop']) {
+                            $trade_details['stop'] = $new_stop;
+                        }
                     }
                 }
             }
         }
 
-        return 0;
+        return false;
     }
 
     /**

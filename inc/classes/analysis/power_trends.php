@@ -68,25 +68,32 @@ class power_trends extends _base_analysis {
         if ($direction === 'long') {
             $type = 'Buy';
             $entry = $latest_day->high + 0.0002;
-            $exit = $latest_day->low - 0.0002;
+            $stop = $latest_day->low - 0.0002;
+
+            if ($entry >= $stop) {
+                return [];
+            }
         } else {
             $type = 'Sell';
             $entry = $latest_day->low - 0.0002;
-            $exit = $latest_day->high + 0.0002;
+            $stop = $latest_day->high + 0.0002;
+
+            if ($entry >= $stop) {
+                return [];
+            }
         }
 
-        $pip_difference = get::pip_difference($entry, $exit);
-
-        $account = new account();
-        $balance = $account->getBalance();
+        $pip_difference = get::pip_difference($entry, $stop);
+        $balance = account::getBalance();
 
         $amount = $balance / $pip_difference;
 
         return [
             'type' => $type,
             'date_time' => $latest_day->date_time,
+            'pair' => $this->currency_pair,
             'entry' => $entry,
-            'exit' => $exit,
+            'stop' => $stop,
             'current_balance' => $balance,
             'pip_difference' => $pip_difference,
             'amount' => $amount,
@@ -100,8 +107,11 @@ class power_trends extends _base_analysis {
      */
     private function getEmas(array $ema_periods = [3, 7, 50]): array {
         $data = $this->getData();
+        $data = array_slice($data, -(max($ema_periods) * 2)); // We only need to work with a small portion of the dataset here
 
-        if (!isset($data[0]->{'ema_' . $ema_periods[0]})) {
+        $most_recent_data = end($data);
+
+        if (!isset($most_recent_data->{'ema_' . $ema_periods[0]})) {
             $close_prices = [];
             foreach ($data as $row) {
                 $close_prices[] = $row->close;
@@ -171,6 +181,10 @@ class power_trends extends _base_analysis {
         $data = $this->getEmas();
         $latest_day = end($data);
 
+        if ($latest_day->high === $latest_day->low) {
+            return false;
+        }
+
         if ($latest_day->ema_3 > $latest_day->ema_7) {
             if ($latest_day->ema_7 > $latest_day->ema_50) {
                 if ($latest_day->getDirection() === 'down' || $latest_day->getDirection() === 'neutral') {
@@ -192,6 +206,10 @@ class power_trends extends _base_analysis {
     protected function isShortEntry() {
         $data = $this->getEmas();
         $latest_day = end($data);
+
+        if ($latest_day->high === $latest_day->low) {
+            return false;
+        }
 
         if ($latest_day->ema_3 < $latest_day->ema_7) {
             if ($latest_day->ema_7 < $latest_day->ema_50) {

@@ -1,40 +1,39 @@
 <?php
-
 /**
  * Class account
  */
 final class account {
 
-    private $account_name = null;
-    private $balance = null;
-    private $currency = null;
-    private $margin_rate = null;
-    private $open_trades = null;
-    private $open_orders = null;
+    private static $account_name = null;
+    private static $balance = null;
+    private static $currency = null;
+    private static $margin_rate = null;
+    private static $open_trades = null;
+    private static $open_orders = null;
 
     /**
      * @return float
      */
-    public function getBalance(): float {
-        if ($this->balance === null) {
-            $this->setAccountDetails();
+    public static function getBalance(): float {
+        if (self::$balance === null) {
+            self::setAccountDetails();
         }
 
-        return $this->balance;
+        return self::$balance;
     }
 
     /**
      *
      */
-    private function setAccountDetails() {
+    private static function setAccountDetails() {
         $api = new oanda_rest_api();
         if ($response = $api->doApiRequest('accounts/' . oanda_base::ACCOUNT_ID, [], 'GET')) {
-            $this->account_name = $response['accountName'];
-            $this->currency = $response['accountCurrency'];
-            $this->margin_rate = $response['marginRate'];
-            $this->balance = $response['balance'];
-            $this->open_trades = $response['openTrades'];
-            $this->open_orders = $response['openOrders'];
+            self::$account_name = $response['accountName'];
+            self::$currency = $response['accountCurrency'];
+            self::$margin_rate = $response['marginRate'];
+            self::$balance = $response['balance'];
+            self::$open_trades = $response['openTrades'];
+            self::$open_orders = $response['openOrders'];
         } else {
             trigger_error('Failed to fetch account details');
         }

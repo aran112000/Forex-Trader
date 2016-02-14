@@ -40,7 +40,7 @@ abstract class _pair {
         if ($response = $oanda->doApiRequest('candles', [
             'instrument' => $this->getPairName(),
             'granularity' => $this->data_fetch_time,
-            'count' => $limit
+            'count' => ($limit > 5000 ? 5000 : $limit)
         ], 'GET')
         ) {
             if (!empty($response['candles'])) {

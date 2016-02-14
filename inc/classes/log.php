@@ -28,7 +28,9 @@ class log {
      * @param int    $severity
      */
     public static function write($message, int $severity) {
-        self::writeToLogs($message, $severity);
+        if (!defined('testing') || !testing) {
+            self::writeToLogs($message, $severity);
+        }
     }
 
     /**

@@ -27,6 +27,7 @@ final class set {
     public static function flushableBuffer() {
         if (!cli) {
             ob_implicit_flush(true);
+            header('X-Accel-Buffering: no', true);
             ini_set('zlib.output_compression', 'Off');
             ini_set('output_buffering', 'Off');
             ini_set('output_handler', '');

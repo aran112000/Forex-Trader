@@ -87,10 +87,7 @@ final class trade {
      * @return float
      */
     private function getNumberUnitsToTrade(float $entry_rate, float $exit_rate): float {
-        $account = new account();
-        $account_balance = $account->getBalance();
-
-        return (($account_balance * (self::MAXIMUM_PERCENTAGE_RISK / 100)) / abs($entry_rate - $exit_rate));
+        return ((account::getBalance() * (self::MAXIMUM_PERCENTAGE_RISK / 100)) / abs($entry_rate - $exit_rate));
     }
 
     /**
