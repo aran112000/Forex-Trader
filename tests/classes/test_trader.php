@@ -5,9 +5,7 @@
  */
 class test_trader {
 
-    const MINIMUM_DATA_POINTS_TO_TEST = 50;
     const MAXIMUM_DATA_POINTS_TO_TEST = 4500;
-
     const PAIRS_TO_TEST = 30;
 
     /**
@@ -27,7 +25,7 @@ class test_trader {
 
             /**@var _pair $pair*/
             $pair->data_fetch_time = 'D';
-            $full_data_set = $pair->getData((self::MAXIMUM_DATA_POINTS_TO_TEST + self::MINIMUM_DATA_POINTS_TO_TEST));
+            $full_data_set = $pair->getData((self::MAXIMUM_DATA_POINTS_TO_TEST));
 
             $candles_inspected = 0;
             $entries = 0;
@@ -76,7 +74,7 @@ class test_trader {
 
             echo '<div style="display:block;width:16.5%;float:left;margin:.08%;padding:.75%;box-sizing:border-box;border:1px solid #ccc;">';
                 echo '<h1 style="margin:0 0 15px 0;">' . $pair->getPairName('/') . ' Results</h1>' . "\n";
-                echo '<p style="padding: 0 0 5px 0;margin:0">Daily candles analysed: ' . number_format($candles_inspected) . ' (' . number_format(($candles_inspected / 365), 2) . ' Years)</p>' . "\n";
+                echo '<p style="padding: 0 0 5px 0;margin:0">Daily candles analysed: ' . number_format($candles_inspected) . ' (' . number_format(($candles_inspected / 365), 1) . ' Yrs)</p>' . "\n";
                 echo '<p style="padding: 0 0 5px 0;margin:0">Trades entries identified: ' . $entries . '</p>' . "\n";
                 echo '<p style="padding: 0 0 5px 0;margin:0">Entries triggered: ' . $valid_trades . ' (' . round((($valid_trades / $entries) * 100), 2) . '%)</p>' . "\n";
                 echo '<p style="padding: 0 0 5px 0;margin:0">Winning trades: ' . $wins . ' (' . round((($wins / $valid_trades) * 100), 2) . '%)</p>' . "\n";
@@ -110,15 +108,15 @@ class test_trader {
     }
 
     /**
-     * @param array $future_data
+     * @param array $future_data_set
      * @param array $trade_details
      *
      * @return array|bool
      */
-    private function doVerifyTrade(array $future_data, array $trade_details) {
+    private function doVerifyTrade(array $future_data_set, array $trade_details) {
         $trading = null;
 
-        foreach ($future_data as $future_data) {
+        foreach ($future_data_set as $future_data) {
             /**@var avg_price_data $future_data */
             if ($trading === null) {
                 if ($trade_details['type'] === 'Buy' && $future_data->close >= $trade_details['entry']) {
@@ -174,31 +172,11 @@ class test_trader {
     }
 
     /**
-     * @param array $score_details
-     *
-     * @return string
-     */
-    private function getScoreInformation(array $score_details): string {
-        $details = '';
-        $score_lines = [];
-        foreach ($score_details['details'] as $row) {
-            if ($row['score']['buy'] > 0) {
-                $score_lines[] = $row['name'] . ' (buy): ' . round($row['score']['buy'], 2);
-            }
-            if ($row['score']['sell'] > 0) {
-                $score_lines[] = $row['name'] . ' (sell): ' . round($row['score']['sell'], 2);
-            }
-        }
-
-        return $details . '<br />' . implode(', ', $score_lines);
-    }
-
-    /**
      * @param string $message
      * @param array  $data
      */
     protected function printResults(string $message, array $data = []) {
-        if (cli) {
+        if (defined('cli') && cli) {
             echo $message . "\n";
             if (!empty($data)) {
                 echo print_r($data, true) . "\n";
