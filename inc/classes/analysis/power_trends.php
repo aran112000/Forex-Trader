@@ -70,7 +70,7 @@ class power_trends extends _base_analysis {
             $entry = $latest_day->high + 0.0002;
             $stop = $latest_day->low - 0.0002;
 
-            if ($entry >= $stop) {
+            if ($entry <= $stop) {
                 return [];
             }
         } else {
