@@ -40,6 +40,8 @@ abstract class _pair {
         if ($response = $oanda->doApiRequest('candles', [
             'instrument' => $this->getPairName(),
             'granularity' => $this->data_fetch_time,
+            'alignmentTimezone' => 'Europe/London',
+            'dailyAlignment' => 22,
             'count' => ($limit > 5000 ? 5000 : $limit)
         ], 'GET')
         ) {
@@ -48,17 +50,15 @@ abstract class _pair {
                     if ($row['complete']) {
                         $class = new avg_price_data();
                         $class->pair = $this;
-                        $class->time = substr($row['time'], 0, 10);
-                        $class->date_time = date('d/m/Y H:i:s', $class->time);
+                        $class->start_date_time = date('d/m/Y H:i:s', substr($row['time'], 0, 10));
                         $class->open = $row['openBid'];
                         $class->close = $row['closeBid'];
                         $class->high = $row['highBid'];
                         $class->low = $row['lowBid'];
                         $class->volume = $row['volume'];
+                        $class->spread = get::pip_difference($row['closeAsk'], $row['closeBid']);
 
                         $result[] = $class;
-                    } else {
-                        echo '<p>Non-complete day skipped...</p>' . "\n";
                     }
                 }
             }

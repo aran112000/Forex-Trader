@@ -26,6 +26,10 @@ class avg_price_data {
      */
     public $close = null;
     /**
+     * @var float
+     */
+    public $spread = null;
+    /**
      * @var int
      */
     public $timekey = null;
@@ -41,6 +45,10 @@ class avg_price_data {
      * @var string
      */
     public $exit_time = null;
+    /**
+     * @var string
+     */
+    public $start_date_time = null;
 
     /**
      * @return string

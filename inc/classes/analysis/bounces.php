@@ -65,6 +65,8 @@ class bounces extends _base_analysis {
      */
     private function getTradeDetails(string $direction): array {
         $data = $this->getData();
+
+        /**@var avg_price_data $latest_day*/
         $latest_day = end($data);
 
         if ($direction === 'long') {
@@ -88,16 +90,18 @@ class bounces extends _base_analysis {
         $pip_difference = get::pip_difference($entry, $stop);
         $balance = account::getBalance();
 
-        $amount = $balance / $pip_difference;
+        $max_per_pip = (($balance / 100) / $pip_difference);
+        $amount = (($balance / 100) / ($max_per_pip + $latest_day->spread));
 
         return [
             'type' => $type,
-            'date_time' => $latest_day->date_time,
+            'start_date_time' => $latest_day->start_date_time,
             'pair' => $this->currency_pair,
             'entry' => $entry,
             'stop' => $stop,
             'current_balance' => $balance,
             'pip_difference' => $pip_difference,
+            'max_per_pip' => round($max_per_pip, 3),
             'amount' => $amount,
         ];
     }

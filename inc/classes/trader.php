@@ -47,6 +47,8 @@ final class trader {
         if ($response = $oanda->doApiRequest('candles', [
             'instrument' => $pair->getPairName(),
             'granularity' => 'D',
+            'alignmentTimezone' => 'Europe/London',
+            'dailyAlignment' => 22,
             'count' => 300
         ], 'GET')) {
             if (!empty($response['candles'])) {
@@ -54,17 +56,15 @@ final class trader {
                     if ($row['complete']) {
                         $class = new avg_price_data();
                         $class->pair = $pair;
-                        $class->time = substr($row['time'], 0, 10);
-                        $class->date_time = date('d/m/Y H:i:s', $class->time);
+                        $class->start_date_time = date('d/m/Y H:i:s', substr($row['time'], 0, 10));
                         $class->open = $row['openBid'];
                         $class->close = $row['closeBid'];
                         $class->high = $row['highBid'];
                         $class->low = $row['lowBid'];
                         $class->volume = $row['volume'];
+                        $class->spread = get::pip_difference($row['closeAsk'], $row['closeBid']);
 
                         $result[] = $class;
-                    } else {
-                        echo '<p>Non-complete day skipped...</p>'."\n";
                     }
                 }
             }
