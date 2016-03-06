@@ -55,12 +55,12 @@ class reversals extends _base_analysis {
                     /**@var _signal $signal */
                     if ($signal::isValidSignal($data)) {
                         $confluence_factors++;
-                        echo '<p style="font-weight:bold;color:red;">Long confluence from: ' . ucwords(str_replace('_', ' ', $signal)) . ' on ' . $data[0]->pair->getPairName() . '</p>'."\n";
+                        //echo '<p style="font-weight:bold;color:red;">Long confluence from: ' . ucwords(str_replace('_', ' ', $signal)) . ' on ' . $data[0]->pair->getPairName() . '</p>'."\n";
                     }
                 }
 
                 if ($confluence_factors >= self::REQUIRED_CONFLUENCE) {
-                    echo '<p>' . $data[0]->pair->getPairName() . ' - Confluence: ' . $confluence_factors . '</p>' . "\n";
+                    //echo '<p>' . $data[0]->pair->getPairName() . ' - Confluence: ' . $confluence_factors . '</p>' . "\n";
 
                     return true;
                 }
@@ -85,12 +85,12 @@ class reversals extends _base_analysis {
                     if ($signal::isValidSignal($data)) {
                         $confluence_factors++;
 
-                        echo '<p style="font-weight:bold;color:red;">Short confluence from: ' . ucwords(str_replace('_', ' ', $signal)) . ' on ' . $data[0]->pair->getPairName() . '</p>' . "\n";
+                        //echo '<p style="font-weight:bold;color:red;">Short confluence from: ' . ucwords(str_replace('_', ' ', $signal)) . ' on ' . $data[0]->pair->getPairName() . '</p>' . "\n";
                     }
                 }
 
                 if ($confluence_factors >= self::REQUIRED_CONFLUENCE) {
-                    echo '<p>' . $data[0]->pair->getPairName() . ' - Confluence: ' . $confluence_factors . '</p>' . "\n";
+                    //echo '<p>' . $data[0]->pair->getPairName() . ' - Confluence: ' . $confluence_factors . '</p>' . "\n";
 
                     return true;
                 }
