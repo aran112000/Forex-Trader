@@ -59,7 +59,7 @@ final class trader {
                         $class->high = $row['highBid'];
                         $class->low = $row['lowBid'];
                         $class->volume = $row['volume'];
-                        $class->spread = get::pip_difference($row['closeAsk'], $row['closeBid'], $pair);
+                        $class->spread = get::pipDifference($row['closeAsk'], $row['closeBid'], $pair);
 
                         $result[] = $class;
                     }

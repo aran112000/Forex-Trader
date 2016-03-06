@@ -6,6 +6,11 @@
 class bounces extends _base_analysis {
 
     /**
+     * @var bool
+     */
+    protected $enabled = false;
+
+    /**
      * @var int
      */
     protected $data_fetch_size = 250;

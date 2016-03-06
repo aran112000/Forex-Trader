@@ -13,7 +13,7 @@ final class get {
      *
      * @return float
      */
-    public static function pip_difference(float $a, float $b, _pair $pair, $abs = true): float {
+    public static function pipDifference(float $a, float $b, _pair $pair, $abs = true): float {
         $multiplier = 10000; // For currency pairs displayed to four decimal places, one pip is equal to 0.0001
         if ($pair->base_currency === 'JPY' || $pair->quote_currency === 'JPY') {
             // Yen-based currency pairs are an exception and are displayed to only two decimal places (0.01)

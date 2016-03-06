@@ -151,21 +151,21 @@ class test_trader {
                 // Trade has begun, continue tracking until we hit our stop loss
                 if ($trade_details['type'] === 'Buy' && $future_data->low <= $trade_details['stop']) {
 
-                    $gain = ($trade_details['stop'] * $trade_details['amount']) - ($trade_details['entry'] * $trade_details['amount']);
+                    $gain = ($trade_details['stop'] - $trade_details['entry']) * $trade_details['amount'];
 
                     // Stop loss hit
                     return [
-                        'pip_gain' => get::pip_difference($trade_details['stop'], $trade_details['entry'], $trade_details['pair'], false),
+                        'pip_gain' => get::pipDifference($trade_details['stop'], $trade_details['entry'], $trade_details['pair'], false),
                         'gain' => round($gain, 3),
-                        'percentage_gain' => round(($gain / ($trade_details['entry'] * $trade_details['amount']) * 100), 4),
+                        'percentage_gain' => round(($gain / ($trade_details['stop'] * $trade_details['amount']) * 100), 4),
                     ];
                 } else if ($trade_details['type'] === 'Sell' && $future_data->high >= $trade_details['stop']) {
 
-                    $gain = ($trade_details['entry'] * $trade_details['amount']) - ($trade_details['stop'] * $trade_details['amount']);
+                    $gain = ($trade_details['entry'] - $trade_details['stop']) * $trade_details['amount'];
 
                     // Stop loss hit
                     return [
-                        'pip_gain' => get::pip_difference($trade_details['entry'], $trade_details['stop'], $trade_details['pair'], false),
+                        'pip_gain' => get::pipDifference($trade_details['entry'], $trade_details['stop'], $trade_details['pair'], false),
                         'gain' => round($gain, 3),
                         'percentage_gain' => round(($gain / ($trade_details['stop'] * $trade_details['amount']) * 100), 4),
                     ];
