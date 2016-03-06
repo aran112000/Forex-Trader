@@ -103,7 +103,7 @@ abstract class _base_analysis {
             }
         }
 
-        $pip_difference = get::pip_difference($entry, $stop);
+        $pip_difference = get::pip_difference($entry, $stop, $latest_day->pair);
         $balance = account::getBalance();
 
         $max_per_pip = (($balance / 100) / $pip_difference);

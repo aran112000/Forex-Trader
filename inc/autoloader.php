@@ -18,5 +18,7 @@ spl_autoload_register(function($class_name) {
         require(root . '/tests/classes/' . $class_name . '.php');
     } else if (is_readable(root . '/inc/charting/' . $class_name . '.php')) {
         require(root . '/inc/charting/' . $class_name . '.php');
+    } else if (is_readable(root . '/inc/classes/signals/' . $class_name . '.php')) {
+        require(root . '/inc/classes/signals/' . $class_name . '.php');
     }
 });

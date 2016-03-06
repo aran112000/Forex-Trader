@@ -6,7 +6,7 @@
 class avg_price_data {
 
     /**
-     * @var string
+     * @var _pair
      */
     public $pair = null;
     /**

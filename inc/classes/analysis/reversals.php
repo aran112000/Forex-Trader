@@ -5,6 +5,8 @@
  */
 class reversals extends _base_analysis {
 
+    const REQUIRED_CONFLUENCE = 2;
+
     /**
      * @var int
      */
@@ -13,7 +15,22 @@ class reversals extends _base_analysis {
     /**
      * @var bool
      */
-    protected $enabled = false;
+    protected $enabled = true;
+
+    private $signals = [
+        'long' => [
+            'low_test',
+            'doji',
+            //'inside_bar',  // TODO
+            //'tweezer_bottoms', // TODO
+        ],
+        'short' => [
+            'high_test',
+            'doji',
+            //'inside_bar', // TODO
+            //'tweezer_tops', // TODO
+        ]
+    ];
 
     /**
      * @param \_pair $currency_pair
@@ -28,12 +45,24 @@ class reversals extends _base_analysis {
      * @return bool
      */
     protected function isLongEntry(): bool {
-        /*$data = $this->getData();
-        $latest_day = end($data);*/
-
         if ($this->getChoppinessIndex() < 60) {
             if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
-                return true;
+
+                $data = $this->getData();
+
+                $confluence_factors = 0;
+                foreach ($this->signals['long'] as $signal) {
+                    /**@var _signal $signal */
+                    if ($signal::isValidSignal($data)) {
+                        $confluence_factors++;
+                    }
+                }
+
+                if ($confluence_factors >= self::REQUIRED_CONFLUENCE) {
+                    echo '<p>' . $data[0]->pair->getPairName() . ' - Confluence: ' . $confluence_factors . '</p>' . "\n";
+
+                    return true;
+                }
             }
         }
 
@@ -44,12 +73,24 @@ class reversals extends _base_analysis {
      * @return bool
      */
     protected function isShortEntry() {
-        /*$data = $this->getData();
-        $latest_day = end($data);*/
-
         if ($this->getChoppinessIndex() < 60) {
             if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
-                return true;
+
+                $data = $this->getData();
+
+                $confluence_factors = 0;
+                foreach ($this->signals['short'] as $signal) {
+                    /**@var _signal $signal */
+                    if ($signal::isValidSignal($data)) {
+                        $confluence_factors++;
+                    }
+                }
+
+                if ($confluence_factors >= self::REQUIRED_CONFLUENCE) {
+                    echo '<p>' . $data[0]->pair->getPairName() . ' - Confluence: ' . $confluence_factors . '</p>' . "\n";
+
+                    return true;
+                }
             }
         }
 

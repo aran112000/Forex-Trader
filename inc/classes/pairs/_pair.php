@@ -7,7 +7,7 @@ abstract class _pair {
 
     protected $enabled = true;
 
-    public $base_currency  = null;
+    public $base_currency = null;
     public $quote_currency = null;
 
     public $data_fetch_time = 'M1';
@@ -56,7 +56,7 @@ abstract class _pair {
                         $class->high = $row['highBid'];
                         $class->low = $row['lowBid'];
                         $class->volume = $row['volume'];
-                        $class->spread = get::pip_difference($row['closeAsk'], $row['closeBid']);
+                        $class->spread = get::pip_difference($row['closeAsk'], $row['closeBid'], $this);
 
                         $result[] = $class;
                     }
