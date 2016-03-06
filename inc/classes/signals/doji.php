@@ -26,7 +26,7 @@ class doji extends _signal {
 
         if ($last_candle_size < $avg_candle_size) {
             $body_pip_size = get::pip_difference($last_period->open, $last_period->close, $last_period->pair);
-            $body_percentage_size = (($last_candle_body_size / $last_candle_size) * 100);
+            $body_percentage_size = abs(($last_candle_body_size / $last_candle_size) * 100);
 
             if ($body_pip_size <= self::MAX_BODY_PIPS && $body_percentage_size <= self::ACCEPTED_MAX_BODY_PERCENTAGE) {
                 return true;

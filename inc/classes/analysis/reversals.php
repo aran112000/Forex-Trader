@@ -21,14 +21,14 @@ class reversals extends _base_analysis {
         'long' => [
             'low_test',
             'doji',
-            //'inside_bar',  // TODO
-            //'tweezer_bottoms', // TODO
+            'inside_bar',
+            'tweezer_bottoms',
         ],
         'short' => [
             'high_test',
             'doji',
-            //'inside_bar', // TODO
-            //'tweezer_tops', // TODO
+            'inside_bar',
+            'tweezer_tops',
         ]
     ];
 
@@ -55,6 +55,7 @@ class reversals extends _base_analysis {
                     /**@var _signal $signal */
                     if ($signal::isValidSignal($data)) {
                         $confluence_factors++;
+                        echo '<p style="font-weight:bold;color:red;">Long confluence from: ' . ucwords(str_replace('_', ' ', $signal)) . ' on ' . $data[0]->pair->getPairName() . '</p>'."\n";
                     }
                 }
 
@@ -83,6 +84,8 @@ class reversals extends _base_analysis {
                     /**@var _signal $signal */
                     if ($signal::isValidSignal($data)) {
                         $confluence_factors++;
+
+                        echo '<p style="font-weight:bold;color:red;">Short confluence from: ' . ucwords(str_replace('_', ' ', $signal)) . ' on ' . $data[0]->pair->getPairName() . '</p>' . "\n";
                     }
                 }
 
