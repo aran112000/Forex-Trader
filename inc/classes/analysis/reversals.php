@@ -11,6 +11,11 @@ class reversals extends _base_analysis {
     protected $data_fetch_size = 250;
 
     /**
+     * @var bool
+     */
+    protected $enabled = false;
+
+    /**
      * @param \_pair $currency_pair
      */
     public function setPair(_pair $currency_pair) {
