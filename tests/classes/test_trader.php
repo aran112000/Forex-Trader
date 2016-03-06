@@ -79,13 +79,21 @@ class test_trader {
             $pair_end_balance = account::getBalance();
             $pair_gross_profit = ((($pair_end_balance - $pair_start_balance) / $pair_start_balance) * 100);
 
+            if ($valid_trades != 0) {
+                $win_percentage = round((($wins / $valid_trades) * 100), 2);
+                $loss_percentage = round((($losses / $valid_trades) * 100), 2);
+            } else {
+                $win_percentage = 0;
+                $loss_percentage = 100;
+            }
+
             echo '<div style="display:block;width:16.5%;float:left;margin:.08%;padding:.75%;box-sizing:border-box;border:1px solid #ccc;">';
                 echo '<h1 style="margin:0 0 10px 0;">' . $pair->getPairName('/') . ' Results</h1>' . "\n";
                 echo '<p style="padding: 0 0 3px 0;margin:0">Daily candles analysed: ' . number_format($candles_inspected) . ' (' . number_format(($candles_inspected / 365), 1) . ' Yrs)</p>' . "\n";
                 echo '<p style="padding: 0 0 3px 0;margin:0">Entries identified: ' . $entries . ' (' . round((($entries / $candles_inspected) * 100), 2) . '%)</p>' . "\n";
                 echo '<p style="padding: 0 0 3px 0;margin:0">Entries triggered: ' . $valid_trades . ' (' . round((($valid_trades / $entries) * 100), 2) . '%)</p>' . "\n";
-                echo '<p style="padding: 0 0 3px 0;margin:0">Winning trades: ' . $wins . ' (' . round((($wins / $valid_trades) * 100), 2) . '%)</p>' . "\n";
-                echo '<p style="padding: 0 0 3px 0;margin:0">Loosing trades: ' . $losses . ' (' . round((($losses / $valid_trades) * 100), 2) . '%)</p>' . "\n";
+                echo '<p style="padding: 0 0 3px 0;margin:0">Winning trades: ' . $wins . ' (' . $win_percentage . '%)</p>' . "\n";
+                echo '<p style="padding: 0 0 3px 0;margin:0">Loosing trades: ' . $losses . ' (' . $loss_percentage . '%)</p>' . "\n";
                 echo '<p style="padding: 0 0 3px 0;margin:0">Gross profit: ' . number_format($pair_gross_profit, 2) . '%</p>' . "\n";
             echo '</div>';
 
@@ -147,7 +155,7 @@ class test_trader {
 
                     // Stop loss hit
                     return [
-                        'pip_gain' => get::pip_difference($trade_details['stop'], $trade_details['entry'], false),
+                        'pip_gain' => get::pip_difference($trade_details['stop'], $trade_details['entry'], $trade_details['pair'], false),
                         'gain' => round($gain, 3),
                         'percentage_gain' => round(($gain / ($trade_details['entry'] * $trade_details['amount']) * 100), 4),
                     ];
@@ -157,7 +165,7 @@ class test_trader {
 
                     // Stop loss hit
                     return [
-                        'pip_gain' => get::pip_difference($trade_details['entry'], $trade_details['stop'], false),
+                        'pip_gain' => get::pip_difference($trade_details['entry'], $trade_details['stop'], $trade_details['pair'], false),
                         'gain' => round($gain, 3),
                         'percentage_gain' => round(($gain / ($trade_details['stop'] * $trade_details['amount']) * 100), 4),
                     ];

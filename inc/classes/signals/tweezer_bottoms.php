@@ -1,7 +1,7 @@
 <?php
 class tweezer_bottoms extends _signal {
 
-    const ALLOWED_PERCENTAGE_DIFFERENCE = 5; // The %age +/- the candles can differ in size
+    const ALLOWED_PERCENTAGE_DIFFERENCE = 10; // The %age +/- the candles can differ in size
 
     /**
      * @param array $data
@@ -18,6 +18,10 @@ class tweezer_bottoms extends _signal {
 
             $first_size = abs($first_period->open - $first_period->close);
             $last_size = abs($last_period->open - $last_period->close);
+
+            if ($last_size == 0 || $first_size == 0) {
+                return false;
+            }
 
             $percentage_difference = abs(($first_size / $last_size) * 100);
 
