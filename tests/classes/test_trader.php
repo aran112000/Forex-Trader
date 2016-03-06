@@ -157,7 +157,7 @@ class test_trader {
                     return [
                         'pip_gain' => get::pipDifference($trade_details['stop'], $trade_details['entry'], $trade_details['pair'], false),
                         'gain' => round($gain, 3),
-                        'percentage_gain' => round(($gain / ($trade_details['stop'] * $trade_details['amount']) * 100), 4),
+                        'percentage_gain' => round(($gain / ($trade_details['entry'] * $trade_details['amount']) * 100), 4),
                     ];
                 } else if ($trade_details['type'] === 'Sell' && $future_data->high >= $trade_details['stop']) {
 
