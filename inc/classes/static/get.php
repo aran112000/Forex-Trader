@@ -6,17 +6,24 @@
 final class get {
 
     /**
-     * @param float $a
-     * @param float $b
-     * @param bool  $abs
+     * @param float  $a
+     * @param float  $b
+     * @param \_pair $pair
+     * @param bool   $abs
      *
      * @return float
      */
-    public static function pip_difference(float $a, float $b, $abs = true): float {
+    public static function pip_difference(float $a, float $b, _pair $pair, $abs = true): float {
+        $multiplier = 10000; // For currency pairs displayed to four decimal places, one pip is equal to 0.0001
+        if ($pair->base_currency === 'JPY' || $pair->quote_currency === 'JPY') {
+            // Yen-based currency pairs are an exception and are displayed to only two decimal places (0.01)
+            $multiplier = 100;
+        }
+
         if ($abs) {
-            return (abs($a - $b) * 10000);
+            return (abs($a - $b) * $multiplier);
         } else {
-            return (($a - $b) * 10000);
+            return (($a - $b) * $multiplier);
         }
     }
 
