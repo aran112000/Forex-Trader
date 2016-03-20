@@ -1,4 +1,8 @@
 <?php
+
+/**
+ * Class low_test
+ */
 class low_test extends _signal {
 
     /**
@@ -8,16 +12,19 @@ class low_test extends _signal {
      * @return bool
      */
     public static function isValidSignal(array $data, string $direction): bool {
-        $last_period = end($data);
-
         /**@var avg_price_data $last_period*/
-        $body_bottom = ($last_period->close < $last_period->open ? $last_period->close : $last_period->open);
+        $last_period = end($data);
+        $last_direction = $last_period->getDirection();
 
-        $candle_top = abs($last_period->high - $body_bottom);
-        $candle_bottom = abs($body_bottom - $last_period->low);
+        if (($direction === 'long' && $last_direction === 'up') || ($direction === 'short' && $last_direction === 'down')) {
+            $body_bottom = ($last_period->close < $last_period->open ? $last_period->close : $last_period->open);
 
-        if ($candle_bottom >= ($candle_top * 2)) {
-            return true;
+            $candle_top = abs($last_period->high - $body_bottom);
+            $candle_bottom = abs($body_bottom - $last_period->low);
+
+            if ($candle_bottom >= ($candle_top * 2)) {
+                return true;
+            }
         }
 
         return false;
