@@ -18,8 +18,13 @@ class inside_bar extends _signal {
             $first_body = abs($first_period->open - $first_period->close);
             $last_candle = abs($last_period->high - $last_period->low);
 
+            $first_body_top = ($first_period->open >= $first_period->close ? $first_period->open : $first_period->close);
+            $first_body_bottom = ($first_period->open <= $first_period->close ? $first_period->open : $first_period->close);
+
             if ($last_candle <= ($first_body / 2)) {
-                return true;
+                if ($first_body_top >= $last_period->high && $first_body_bottom <= $last_period->low) {
+                    return true;
+                }
             }
         }
 
