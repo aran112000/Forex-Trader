@@ -6,7 +6,7 @@
 class test_trader {
 
     const MINIMUM_DATA_POINTS_TO_TEST = 50;
-    const MAXIMUM_DATA_POINTS_TO_TEST = /*(1 * 365)*/50;
+    const MAXIMUM_DATA_POINTS_TO_TEST = (1 * 365);
     const PAIRS_TO_TEST = 30;
 
     /**
