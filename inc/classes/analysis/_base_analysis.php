@@ -44,7 +44,6 @@ abstract class _base_analysis {
         $method = get_called_class();
 
         log::write($method . ' called', log::INFO);
-        $direction = false;
         $trade_details = [];
 
         // This is ONLY enabled once each day just after 22:00 (a couple of minutes allows for any time delays)
@@ -56,17 +55,28 @@ abstract class _base_analysis {
             if ($this->isShortEntry()) {
                 $direction = 'short';
                 $trade_details = $this->getTradeDetails($direction);
-            } else if ($this->isLongEntry()) {
-                $direction = 'long';
-                $trade_details = $this->getTradeDetails($direction);
+
+                if (!defined('testing') || !testing) {
+                    if ($direction !== false) {
+                        log::write($direction . ' trade found', log::DEBUG);
+                        email::send($method . ' entry signal found', '<p>A ' . $direction . ' entry opportunity for ' . $this->currency_pair->getPairName('/') . '</p><p><pre>' . print_r($trade_details, true) . '</pre></p>', 'cdtreeks@gmail.com,jainikadrenkhan@gmail.com');
+                    } else {
+                        log::write('No trade found', log::DEBUG);
+                    }
+                }
             }
 
-            if (!defined('testing') || !testing) {
-                if ($direction !== false) {
-                    log::write($direction . ' trade found', log::DEBUG);
-                    email::send($method . ' entry signal found', '<p>A ' . $direction . ' entry opportunity for ' . $this->currency_pair->getPairName('/') . '</p><p><pre>' . print_r($trade_details, true) . '</pre></p>', 'cdtreeks@gmail.com,jainikadrenkhan@gmail.com');
-                } else {
-                    log::write('No trade found', log::DEBUG);
+            if ($this->isLongEntry()) {
+                $direction = 'long';
+                $trade_details = $this->getTradeDetails($direction);
+
+                if (!defined('testing') || !testing) {
+                    if ($direction !== false) {
+                        log::write($direction . ' trade found', log::DEBUG);
+                        email::send($method . ' entry signal found', '<p>A ' . $direction . ' entry opportunity for ' . $this->currency_pair->getPairName('/') . '</p><p><pre>' . print_r($trade_details, true) . '</pre></p>', 'cdtreeks@gmail.com,jainikadrenkhan@gmail.com');
+                    } else {
+                        log::write('No trade found', log::DEBUG);
+                    }
                 }
             }
         }

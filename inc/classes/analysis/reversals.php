@@ -45,9 +45,11 @@ class reversals extends _base_analysis {
      * @return bool
      */
     protected function isLongEntry(): bool {
-        if ($this->getChoppinessIndex() < 60) {
-            if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
 
+            $choppiness = $this->getChoppinessIndex();
+
+            if ($choppiness <= 60 && $choppiness >= 20) {
                 $data = $this->getData();
 
                 $confluence_factors = 0;
@@ -55,7 +57,10 @@ class reversals extends _base_analysis {
                     /**@var _signal $signal */
                     if ($signal::isValidSignal($data)) {
                         $confluence_factors++;
-                        //echo '<p style="font-weight:bold;color:red;">Long confluence from: ' . ucwords(str_replace('_', ' ', $signal)) . ' on ' . $data[0]->pair->getPairName() . '</p>'."\n";
+
+                        $latest_day = end($data);
+                        echo '<p style="font-weight:bold;color:red;">Long confluence from: ' . ucwords(str_replace('_', ' ', $signal)) . ' on ' . $latest_day->pair->getPairName() . '</p>'."\n";
+                        echo '<p><pre>' . print_r($latest_day, true) . '</pre></p>';
                     }
                 }
 
@@ -74,8 +79,10 @@ class reversals extends _base_analysis {
      * @return bool
      */
     protected function isShortEntry() {
-        if ($this->getChoppinessIndex() < 60) {
-            if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+
+            $choppiness = $this->getChoppinessIndex();
+            if ($choppiness <= 60 && $choppiness >= 20) {
 
                 $data = $this->getData();
 
@@ -85,7 +92,9 @@ class reversals extends _base_analysis {
                     if ($signal::isValidSignal($data)) {
                         $confluence_factors++;
 
-                        //echo '<p style="font-weight:bold;color:red;">Short confluence from: ' . ucwords(str_replace('_', ' ', $signal)) . ' on ' . $data[0]->pair->getPairName() . '</p>' . "\n";
+                        $latest_day = end($data);
+                        echo '<p style="font-weight:bold;color:red;">Short confluence from: ' . ucwords(str_replace('_', ' ', $signal)) . ' on ' . $latest_day->pair->getPairName() . '</p>' . "\n";
+                        echo '<p><pre>' . print_r($latest_day, true) . '</pre></p>';
                     }
                 }
 

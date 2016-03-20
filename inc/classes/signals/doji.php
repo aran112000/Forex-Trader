@@ -7,9 +7,6 @@ class doji extends _signal {
 
     const CANDLE_AVERAGE_PERIOD = 15; // Periods
 
-    const MAX_BODY_PIPS = 5; // The maximum pips the body of the candle can be of the full day
-    const ACCEPTED_MAX_BODY_PERCENTAGE = 30; // The percentage the body of the candle can be of the full day
-
     /**
      * @param array $data
      *
@@ -22,13 +19,13 @@ class doji extends _signal {
 
         // As dojis need to be relatively small in size, the current period candle must be less than the period average
         $last_candle_size = abs($last_period->high - $last_period->low);
-        $last_candle_body_size = abs($last_period->open - $last_period->close);
 
-        if ($last_candle_size < $avg_candle_size) {
-            $body_pip_size = get::pipDifference($last_period->open, $last_period->close, $last_period->pair);
-            $body_percentage_size = abs(($last_candle_body_size / $last_candle_size) * 100);
+        if ($last_candle_size <= $avg_candle_size) {
+            $body_size = abs($last_period->open - $last_period->close);
+            $top_size = abs($last_period->high - ($last_period->open > $last_period->close ? $last_period->open : $last_period->close));
+            $bottom_size = abs($last_period->low - ($last_period->open < $last_period->close ? $last_period->open : $last_period->close));
 
-            if ($body_pip_size <= self::MAX_BODY_PIPS && $body_percentage_size <= self::ACCEPTED_MAX_BODY_PERCENTAGE) {
+            if ($body_size <= $top_size && $body_size <= $bottom_size) {
                 return true;
             }
         }
@@ -52,6 +49,6 @@ class doji extends _signal {
             $sum += $candle_size;
         }
 
-        return ($sum / self::CANDLE_AVERAGE_PERIOD);
+        return ($sum / count($period_data));
     }
 }

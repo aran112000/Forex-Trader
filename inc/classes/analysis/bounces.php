@@ -35,11 +35,13 @@ class bounces extends _base_analysis {
             return false;
         }
 
+        $choppiness = $this->getChoppinessIndex();
+
         // Look for an 20 EMA bounce
         if ($latest_day->ema_20 > $latest_day->ema_50) {
             if ($latest_day->low < $latest_day->ema_20) {
                 if ($latest_day->open > $latest_day->ema_20 && $latest_day->close > $latest_day->ema_20) {
-                    if ($this->getChoppinessIndex() < 60) {
+                    if ($choppiness <= 60 && $choppiness >= 20) {
                         if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
                             return true;
                         }
@@ -52,7 +54,7 @@ class bounces extends _base_analysis {
         if ($latest_day->ema_20 > $latest_day->ema_50) {
             if ($latest_day->low < $latest_day->ema_50) {
                 if ($latest_day->open > $latest_day->ema_50 && $latest_day->close > $latest_day->ema_50) {
-                    if ($this->getChoppinessIndex() < 60) {
+                    if ($choppiness <= 60 && $choppiness >= 20) {
                         if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
                             return true;
                         }
@@ -75,11 +77,13 @@ class bounces extends _base_analysis {
             return false;
         }
 
+        $choppiness = $this->getChoppinessIndex();
+
         // Look for an 20 EMA bounce
         if ($latest_day->ema_20 < $latest_day->ema_50) {
             if ($latest_day->high > $latest_day->ema_20) {
                 if ($latest_day->open < $latest_day->ema_20 && $latest_day->close < $latest_day->ema_20) {
-                    if ($this->getChoppinessIndex() < 60) {
+                    if ($choppiness <= 60 && $choppiness >= 20) {
                         if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
                             return true;
                         }
@@ -92,7 +96,7 @@ class bounces extends _base_analysis {
         if ($latest_day->ema_20 < $latest_day->ema_50) {
             if ($latest_day->high > $latest_day->ema_50) {
                 if ($latest_day->open < $latest_day->ema_50 && $latest_day->close < $latest_day->ema_50) {
-                    if ($this->getChoppinessIndex() < 60) {
+                    if ($choppiness <= 60 && $choppiness >= 20) {
                         if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
                             return true;
                         }
