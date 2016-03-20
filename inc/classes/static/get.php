@@ -6,6 +6,39 @@
 final class get {
 
     /**
+     * @param array $data
+     * @param int   $history_periods
+     *
+     * @return bool|string
+     */
+    public static function historicalPriceDirection(array $data, $history_periods = 5) {
+        $data = array_slice($data, -$history_periods);
+
+        if (count($data) === $history_periods) {
+            /**@var avg_price_data $start*/
+            $start = array_shift($data);
+            $last_price = $start->close;
+            $difference = 0;
+
+            foreach ($data as $row) {
+                /**@var avg_price_data $row*/
+                $difference += self::pipDifference($last_price, $row->close, $row->pair, false);
+                $last_price = $row->close;
+            }
+
+            if ($difference > 0) {
+                return 'down';
+            } else if ($difference > 0) {
+                return 'up';
+            } else {
+                return 'neutral';
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param float  $a
      * @param float  $b
      * @param \_pair $pair
