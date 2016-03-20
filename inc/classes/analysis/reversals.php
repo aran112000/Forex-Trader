@@ -64,7 +64,7 @@ class reversals extends _base_analysis {
                     $confluence_factors = 0;
                     foreach ($this->signals['long'] as $signal) {
                         /**@var _signal $signal */
-                        if ($signal::isValidSignal($data, 'long')) { // TODO; Long
+                        if ($signal::isValidSignal($data, 'long')) { // TODO; Long - Tweezer Bottoms & Inside Bar
                             $confluence_factors++;
 
                             $latest_day = end($data);
@@ -101,7 +101,7 @@ class reversals extends _base_analysis {
                     $confluence_factors = 0;
                     foreach ($this->signals['short'] as $signal) {
                         /**@var _signal $signal */
-                        if ($signal::isValidSignal($data, 'short')) { // TODO; Short
+                        if ($signal::isValidSignal($data, 'short')) { // TODO; Short - Tweezer Tops & Inside Bar
                             $confluence_factors++;
 
                             $latest_day = end($data);
