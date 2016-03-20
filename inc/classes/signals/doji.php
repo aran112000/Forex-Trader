@@ -16,19 +16,29 @@ class doji extends _signal {
     public static function isValidSignal(array $data, string $direction): bool {
         /**@var avg_price_data $last_period*/
         $last_period = end($data);
-        $avg_candle_size = self::getAverageCandleSize($data);
 
-        // As dojis need to be relatively small in size, the current period candle must be less than the period average
-        $last_candle_size = abs($last_period->high - $last_period->low);
+        $market_direction = get::historicalPriceDirection($data);
+        $last_direction = $last_period->getDirection();
 
-        if ($last_candle_size <= $avg_candle_size) {
-            $body_size = abs($last_period->open - $last_period->close);
-            $top_size = abs($last_period->high - ($last_period->open > $last_period->close ? $last_period->open : $last_period->close));
-            $bottom_size = abs($last_period->low - ($last_period->open < $last_period->close ? $last_period->open : $last_period->close));
+        if (
+            ($market_direction === 'up' && ($last_direction === 'down' || $last_direction === 'neutral')) // Bullish
+                ||
+            ($market_direction === 'down' && ($last_direction === 'up' || $last_direction === 'neutral')) // Bearish
+        ) {
 
-            if ($body_size <= $top_size && $body_size <= $bottom_size) {
-                return true;
+            // As dojis need to be relatively small in size, the current period candle must be less than the period average
+            $last_candle_size = abs($last_period->high - $last_period->low);
+
+            if ($last_candle_size <= self::getAverageCandleSize($data)) {
+                $body_size = abs($last_period->open - $last_period->close);
+                $top_size = abs($last_period->high - ($last_period->open > $last_period->close ? $last_period->open : $last_period->close));
+                $bottom_size = abs($last_period->low - ($last_period->open < $last_period->close ? $last_period->open : $last_period->close));
+
+                if ($body_size <= ($top_size * 1.1) && $body_size <= ($bottom_size * 1.1)) { // Must be < +10%
+                    return true;
+                }
             }
+
         }
 
         return false;
