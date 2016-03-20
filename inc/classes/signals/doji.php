@@ -20,6 +20,7 @@ class doji extends _signal {
         $market_direction = get::historicalPriceDirection($data);
         $last_direction = $last_period->getDirection();
 
+        // Bearish after a run up. Bullish after a run down
         if (
             ($market_direction === 'up' && ($last_direction === 'down' || $last_direction === 'neutral')) // Bullish
                 ||
