@@ -56,4 +56,18 @@ class avg_price_data {
     public function getDirection(): string {
         return ($this->open > $this->close ? 'down' : ($this->open < $this->close ? 'up' : 'neutral'));
     }
+
+    /**
+     * @return bool
+     */
+    public function isBullish(): bool {
+        return ($this->open <= $this->close);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBearish(): bool {
+        return ($this->open >= $this->close);
+    }
 }

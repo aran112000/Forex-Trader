@@ -1,13 +1,17 @@
 <?php
 
+/**
+ * Class high_test
+ */
 class high_test extends _signal {
 
     /**
-     * @param array $data
+     * @param array  $data
+     * @param string $direction
      *
      * @return bool
      */
-    public static function isValidSignal(array $data): bool {
+    public static function isValidSignal(array $data, string $direction): bool {
         $last_period = end($data);
 
         /**@var avg_price_data $last_period */

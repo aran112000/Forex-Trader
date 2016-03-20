@@ -8,11 +8,12 @@ class doji extends _signal {
     const CANDLE_AVERAGE_PERIOD = 15; // Periods
 
     /**
-     * @param array $data
+     * @param array  $data
+     * @param string $direction
      *
      * @return bool
      */
-    public static function isValidSignal(array $data): bool {
+    public static function isValidSignal(array $data, string $direction): bool {
         /**@var avg_price_data $last_period*/
         $last_period = end($data);
         $avg_candle_size = self::getAverageCandleSize($data);

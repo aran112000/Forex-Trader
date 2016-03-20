@@ -4,11 +4,12 @@ class tweezer_bottoms extends _signal {
     const ALLOWED_PERCENTAGE_DIFFERENCE = 10; // The %age +/- the candles can differ in size
 
     /**
-     * @param array $data
+     * @param array  $data
+     * @param string $direction
      *
      * @return bool
      */
-    public static function isValidSignal(array $data): bool {
+    public static function isValidSignal(array $data, string $direction): bool {
         $last_two_periods = array_slice($data, -2);
 
         if (count($last_two_periods) == 2) {
