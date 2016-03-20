@@ -13,7 +13,7 @@ class low_test extends _signal {
      */
     public static function isValidSignal(array $data, string $direction): bool {
         if ($direction === 'short') {
-            trigger_error('Error: High test called for a short entry');
+            trigger_error('Error: Low test called for a short entry');
 
             return false;
         }
