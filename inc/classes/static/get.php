@@ -27,9 +27,9 @@ final class get {
             }
 
             if ($difference > 0) {
-                return 'down';
-            } else if ($difference > 0) {
                 return 'up';
+            } else if ($difference < 0) {
+                return 'down';
             } else {
                 return 'neutral';
             }
