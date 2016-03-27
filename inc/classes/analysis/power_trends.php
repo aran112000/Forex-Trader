@@ -6,6 +6,11 @@
 class power_trends extends _base_analysis {
 
     /**
+     * @var bool
+     */
+    protected $enabled = false;
+
+    /**
      * @var int
      */
     protected $data_fetch_size = 250;
@@ -33,8 +38,12 @@ class power_trends extends _base_analysis {
         if ($latest_day->ema_3 > $latest_day->ema_7) {
             if ($latest_day->ema_7 > $latest_day->ema_50) {
                 if ($latest_day->getDirection() === 'down' || $latest_day->getDirection() === 'neutral') {
-                    if ($this->getChoppinessIndex() < 60) {
-                        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+
+                    $choppiness = $this->getChoppinessIndex();
+
+                    if ($choppiness <= 60 && $choppiness >= 20) {
+                        $atr_direction = $this->getAtrDirection();
+                        if ($atr_direction === 'down' || $atr_direction === 'sideways') {
                             return true;
                         }
                     }
@@ -59,8 +68,12 @@ class power_trends extends _base_analysis {
         if ($latest_day->ema_3 < $latest_day->ema_7) {
             if ($latest_day->ema_7 < $latest_day->ema_50) {
                 if ($latest_day->getDirection() === 'up' || $latest_day->getDirection() === 'neutral') {
-                    if ($this->getChoppinessIndex() < 60) {
-                        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+
+                    $choppiness = $this->getChoppinessIndex();
+
+                    if ($choppiness <= 60 && $choppiness >= 20) {
+                        $atr_direction = $this->getAtrDirection();
+                        if ($atr_direction === 'down' || $atr_direction === 'sideways') {
                             return true;
                         }
                     }

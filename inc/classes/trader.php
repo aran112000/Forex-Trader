@@ -23,9 +23,6 @@ final class trader {
     public function initSwingTradeAlerts() {
         foreach (pairs::getPairs() as $pair) {
             /**@var _pair $pair */
-            echo '<p>Processing ' . $pair->getPairName('/') . '</p>'."\n";
-            flush();
-
             $analysis = new _analysis();
             $analysis->default_pair_data = $this->getSwingTradeData($pair);
             $analysis->doAnalysePair($pair, function(array $score_details) {
@@ -62,7 +59,7 @@ final class trader {
                         $class->high = $row['highBid'];
                         $class->low = $row['lowBid'];
                         $class->volume = $row['volume'];
-                        $class->spread = get::pip_difference($row['closeAsk'], $row['closeBid']);
+                        $class->spread = get::pipDifference($row['closeAsk'], $row['closeBid'], $pair);
 
                         $result[] = $class;
                     }

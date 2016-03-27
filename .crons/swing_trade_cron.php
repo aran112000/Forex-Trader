@@ -9,3 +9,5 @@ account::setBalance(49226.37);
 
 $trader = new trader();
 $trader->initSwingTradeAlerts();
+
+echo 'Completed.';

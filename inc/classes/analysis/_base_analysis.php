@@ -44,7 +44,6 @@ abstract class _base_analysis {
         $method = get_called_class();
 
         log::write($method . ' called', log::INFO);
-        $direction = false;
         $trade_details = [];
 
         // This is ONLY enabled once each day just after 22:00 (a couple of minutes allows for any time delays)
@@ -56,17 +55,28 @@ abstract class _base_analysis {
             if ($this->isShortEntry()) {
                 $direction = 'short';
                 $trade_details = $this->getTradeDetails($direction);
-            } else if ($this->isLongEntry()) {
-                $direction = 'long';
-                $trade_details = $this->getTradeDetails($direction);
+
+                if (!defined('testing') || !testing) {
+                    if ($direction !== false) {
+                        log::write($direction . ' trade found', log::DEBUG);
+                        email::send($method . ' entry signal found', '<p>A ' . $direction . ' entry opportunity for ' . $this->currency_pair->getPairName('/') . '</p><p><pre>' . print_r($trade_details, true) . '</pre></p>', 'cdtreeks@gmail.com,jainikadrenkhan@gmail.com');
+                    } else {
+                        log::write('No trade found', log::DEBUG);
+                    }
+                }
             }
 
-            if (!defined('testing') || !testing) {
-                if ($direction !== false) {
-                    log::write($direction . ' trade found', log::DEBUG);
-                    email::send($method . ' entry signal found', '<p>A ' . $direction . ' entry opportunity for ' . $this->currency_pair->getPairName('/') . '</p><p><pre>' . print_r($trade_details, true) . '</pre></p>', 'cdtreeks@gmail.com,jainikadrenkhan@gmail.com');
-                } else {
-                    log::write('No trade found', log::DEBUG);
+            if ($this->isLongEntry()) {
+                $direction = 'long';
+                $trade_details = $this->getTradeDetails($direction);
+
+                if (!defined('testing') || !testing) {
+                    if ($direction !== false) {
+                        log::write($direction . ' trade found', log::DEBUG);
+                        email::send($method . ' entry signal found', '<p>A ' . $direction . ' entry opportunity for ' . $this->currency_pair->getPairName('/') . '</p><p><pre>' . print_r($trade_details, true) . '</pre></p>', 'cdtreeks@gmail.com,jainikadrenkhan@gmail.com');
+                    } else {
+                        log::write('No trade found', log::DEBUG);
+                    }
                 }
             }
         }
@@ -103,7 +113,7 @@ abstract class _base_analysis {
             }
         }
 
-        $pip_difference = get::pip_difference($entry, $stop);
+        $pip_difference = get::pipDifference($entry, $stop, $latest_day->pair);
         $balance = account::getBalance();
 
         $max_per_pip = (($balance / 100) / $pip_difference);
@@ -162,7 +172,7 @@ abstract class _base_analysis {
         $choppiness_index = new choppiness_index();
         $index = $choppiness_index->get($data);
 
-        return $index;
+        return round($index);
     }
 
     /**
@@ -189,7 +199,12 @@ abstract class _base_analysis {
 
         $last_two_data_points = array_slice($data, -2);
 
-        if ($last_two_data_points[0]->atr >= $last_two_data_points[1]->atr) {
+        $atr_1 = round($last_two_data_points[0]->atr, 4);
+        $atr_2 = round($last_two_data_points[1]->atr, 4);
+
+        if ($atr_1 === $atr_2) {
+            return 'sideways';
+        } else if ($atr_1 > $atr_2) {
             return 'down';
         } else {
             return 'up';

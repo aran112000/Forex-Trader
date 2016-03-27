@@ -1,6 +1,7 @@
 <?php
 define('APP_NAME', 'Forex Trader');
 setPaths();
+date_default_timezone_set('Europe/London');
 require('autoloader.php');
 
 set::define('live', false);
