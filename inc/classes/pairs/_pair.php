@@ -5,7 +5,7 @@
  */
 abstract class _pair {
 
-    protected $enabled = false;
+    protected $enabled = true;
 
     public $base_currency = null;
     public $quote_currency = null;
