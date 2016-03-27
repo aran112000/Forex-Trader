@@ -67,9 +67,9 @@ class reversals extends _base_analysis {
                         if ($signal::isValidSignal($data, 'long')) { // TODO; Long - Tweezer Bottoms & Inside Bar
                             $confluence_factors++;
 
-                            $latest_day = end($data);
+                            /*$latest_day = end($data);
                             echo '<p style="font-weight:bold;color:red;">Long confluence from: ' . ucwords(str_replace('_', ' ', $signal)) . ' on ' . $latest_day->pair->getPairName() . '</p>'."\n";
-                            echo '<p><pre>' . print_r($latest_day, true) . '</pre></p>';
+                            echo '<p><pre>' . print_r($latest_day, true) . '</pre></p>';*/
                         }
                     }
 
@@ -104,9 +104,9 @@ class reversals extends _base_analysis {
                         if ($signal::isValidSignal($data, 'short')) { // TODO; Short - Tweezer Tops & Inside Bar
                             $confluence_factors++;
 
-                            $latest_day = end($data);
+                            /*$latest_day = end($data);
                             echo '<p style="font-weight:bold;color:red;">Short confluence from: ' . ucwords(str_replace('_', ' ', $signal)) . ' on ' . $latest_day->pair->getPairName() . '</p>' . "\n";
-                            echo '<p><pre>' . print_r($latest_day, true) . '</pre></p>';
+                            echo '<p><pre>' . print_r($latest_day, true) . '</pre></p>';*/
                         }
                     }
 
