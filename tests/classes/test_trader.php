@@ -49,6 +49,13 @@ class test_trader {
 
                     $analysis = new _analysis();
                     $analysis->default_pair_data = $test_data;
+
+                    $latest_day = end($test_data);
+                    if (get::date('w', $latest_day->date) == 5) {
+                        // Skip placing any trades on a Friday
+                        continue;
+                    }
+
                     $results = $analysis->doScorePair($pair);
                     $trade_details = $results['entries'];
 
