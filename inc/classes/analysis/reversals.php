@@ -5,8 +5,10 @@
  */
 class reversals extends _base_analysis {
 
-    const REQUIRED_CONFLUENCE = 2;
+    const REQUIRED_CONFLUENCE = 1;
     const HISTORICAL_PRICE_DIRECTION_PERIODS = 4; // The number of days to check historical price movement against
+
+    const OUTPUT_RESULTS = false;
 
     /**
      * @var int
@@ -53,7 +55,8 @@ class reversals extends _base_analysis {
      * @return bool
      */
     protected function isLongEntry(): bool {
-        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+        $atr_direction = $this->getAtrDirection();
+        if ($atr_direction === 'down' || $atr_direction === 'sideways') {
 
             $choppiness = $this->getChoppinessIndex();
 
@@ -64,18 +67,23 @@ class reversals extends _base_analysis {
                     $confluence_factors = 0;
                     foreach ($this->signals['long'] as $signal) {
                         /**@var _signal $signal */
-                        if ($signal::isValidSignal($data, 'long')) { // TODO; Long - Tweezer Bottoms & Inside Bar
+                        if ($signal::isValidSignal($data, 'long')) {
                             $confluence_factors++;
 
-                            /*$latest_day = end($data);
-                            echo '<p style="font-weight:bold;color:red;">Long confluence from: ' . ucwords(str_replace('_', ' ', $signal)) . ' on ' . $latest_day->pair->getPairName() . '</p>'."\n";
-                            echo '<p><pre>' . print_r($latest_day, true) . '</pre></p>';*/
+                            if (self::OUTPUT_RESULTS) {
+                                $latest_day = end($data);
+
+                                echo '<p style="color:red;">
+                                    <strong>Long Signal:</strong><br />
+                                    ' . ucwords(str_replace('_', ' ', $signal)) . '<br />
+                                    ' . $latest_day->pair->getPairName() . '<br />
+                                    ' . $latest_day->start_date_time . ' <em>(+ 1 day)</em>
+                                </p>'."\n";
+                            }
                         }
                     }
 
                     if ($confluence_factors >= self::REQUIRED_CONFLUENCE) {
-                        //echo '<p>' . $data[0]->pair->getPairName() . ' - Confluence: ' . $confluence_factors . '</p>' . "\n";
-
                         return true;
                     }
                 }
@@ -90,7 +98,8 @@ class reversals extends _base_analysis {
      */
     protected function isShortEntry() {
         $this->getHistoricalPriceDirection();
-        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+        $atr_direction = $this->getAtrDirection();
+        if ($atr_direction === 'down' || $atr_direction === 'sideways') {
 
             $choppiness = $this->getChoppinessIndex();
             if ($choppiness <= 60 && $choppiness >= 20) {
@@ -101,18 +110,23 @@ class reversals extends _base_analysis {
                     $confluence_factors = 0;
                     foreach ($this->signals['short'] as $signal) {
                         /**@var _signal $signal */
-                        if ($signal::isValidSignal($data, 'short')) { // TODO; Short - Tweezer Tops & Inside Bar
+                        if ($signal::isValidSignal($data, 'short')) {
                             $confluence_factors++;
 
-                            /*$latest_day = end($data);
-                            echo '<p style="font-weight:bold;color:red;">Short confluence from: ' . ucwords(str_replace('_', ' ', $signal)) . ' on ' . $latest_day->pair->getPairName() . '</p>' . "\n";
-                            echo '<p><pre>' . print_r($latest_day, true) . '</pre></p>';*/
+                            if (self::OUTPUT_RESULTS) {
+                                $latest_day = end($data);
+
+                                echo '<p style="color:red;">
+                                    <strong>Short Signal:</strong><br />
+                                    ' . ucwords(str_replace('_', ' ', $signal)) . '<br />
+                                    ' . $latest_day->pair->getPairName() . '<br />
+                                    ' . $latest_day->start_date_time . ' <em>(+ 1 day)</em>
+                                </p>' . "\n";
+                            }
                         }
                     }
 
                     if ($confluence_factors >= self::REQUIRED_CONFLUENCE) {
-                        //echo '<p>' . $data[0]->pair->getPairName() . ' - Confluence: ' . $confluence_factors . '</p>' . "\n";
-
                         return true;
                     }
                 }
