@@ -39,15 +39,15 @@ final class get {
     }
 
     /**
-     * @param string $uk_date_time_string
+     * @param string $date_string
+     * @param string $uk_date_string
      *
-     * @return int
+     * @return string
      */
-    public function gmtStringToTimestamp(string $uk_date_time_string): int {
-        list($date, $time) = explode(' ', $uk_date_time_string);
-        list($day, $month, $year) = explode('/', $date);
+    public static function date(string $date_string, string $uk_date_string): string {
+        list($day, $month, $year) = explode('/', $uk_date_string);
 
-        return strtotime($month . '/' . $day . '/' . $year . ' ' . $time);
+        return date($date_string, strtotime($month . '/' . $day . '/' . $year));
     }
 
     /**
