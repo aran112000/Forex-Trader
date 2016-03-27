@@ -42,7 +42,8 @@ class bounces extends _base_analysis {
             if ($latest_day->low < $latest_day->ema_20) {
                 if ($latest_day->open > $latest_day->ema_20 && $latest_day->close > $latest_day->ema_20) {
                     if ($choppiness <= 60 && $choppiness >= 20) {
-                        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+                        $atr_direction = $this->getAtrDirection();
+                        if ($atr_direction === 'down' || $atr_direction === 'sideways') {
                             return true;
                         }
                     }
@@ -55,7 +56,8 @@ class bounces extends _base_analysis {
             if ($latest_day->low < $latest_day->ema_50) {
                 if ($latest_day->open > $latest_day->ema_50 && $latest_day->close > $latest_day->ema_50) {
                     if ($choppiness <= 60 && $choppiness >= 20) {
-                        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+                        $atr_direction = $this->getAtrDirection();
+                        if ($atr_direction === 'down' || $atr_direction === 'sideways') {
                             return true;
                         }
                     }
@@ -84,7 +86,8 @@ class bounces extends _base_analysis {
             if ($latest_day->high > $latest_day->ema_20) {
                 if ($latest_day->open < $latest_day->ema_20 && $latest_day->close < $latest_day->ema_20) {
                     if ($choppiness <= 60 && $choppiness >= 20) {
-                        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+                        $atr_direction = $this->getAtrDirection();
+                        if ($atr_direction === 'down' || $atr_direction === 'sideways') {
                             return true;
                         }
                     }
@@ -97,7 +100,8 @@ class bounces extends _base_analysis {
             if ($latest_day->high > $latest_day->ema_50) {
                 if ($latest_day->open < $latest_day->ema_50 && $latest_day->close < $latest_day->ema_50) {
                     if ($choppiness <= 60 && $choppiness >= 20) {
-                        if ($this->getAtrDirection() === 'down' || $this->getAtrDirection() === 'sideways') {
+                        $atr_direction = $this->getAtrDirection();
+                        if ($atr_direction === 'down' || $atr_direction === 'sideways') {
                             return true;
                         }
                     }
