@@ -53,7 +53,7 @@ final class trader {
                     if ($row['complete']) {
                         $class = new avg_price_data();
                         $class->pair = $pair;
-                        $class->start_date_time = date('d/m/Y H:i:s', substr($row['time'], 0, 10));
+                        $class->date = date('d/m/Y', strtotime('+2 hours', substr($row['time'], 0, 10)));
                         $class->open = $row['openBid'];
                         $class->close = $row['closeBid'];
                         $class->high = $row['highBid'];

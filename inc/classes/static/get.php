@@ -39,6 +39,18 @@ final class get {
     }
 
     /**
+     * @param string $uk_date_time_string
+     *
+     * @return int
+     */
+    public function gmtStringToTimestamp(string $uk_date_time_string): int {
+        list($date, $time) = explode(' ', $uk_date_time_string);
+        list($day, $month, $year) = explode('/', $date);
+
+        return strtotime($month . '/' . $day . '/' . $year . ' ' . $time);
+    }
+
+    /**
      * @param array $full_data
      * @param int   $average_period
      *

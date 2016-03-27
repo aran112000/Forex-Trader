@@ -48,7 +48,7 @@ class avg_price_data {
     /**
      * @var string
      */
-    public $start_date_time = null;
+    public $date = null;
 
     /**
      * @return string

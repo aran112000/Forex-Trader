@@ -8,7 +8,7 @@ class reversals extends _base_analysis {
     const REQUIRED_CONFLUENCE = 1;
     const HISTORICAL_PRICE_DIRECTION_PERIODS = 4; // The number of days to check historical price movement against
 
-    const OUTPUT_RESULTS = false;
+    const OUTPUT_RESULTS = true;
 
     /**
      * @var int
@@ -77,7 +77,7 @@ class reversals extends _base_analysis {
                                     <strong>Long Signal:</strong><br />
                                     ' . ucwords(str_replace('_', ' ', $signal)) . '<br />
                                     ' . $latest_day->pair->getPairName() . '<br />
-                                    ' . $latest_day->start_date_time . ' <em>(+ 1 day)</em>
+                                    ' . $latest_day->date . '
                                 </p>'."\n";
 
 
@@ -122,7 +122,7 @@ class reversals extends _base_analysis {
                                     <strong>Short Signal:</strong><br />
                                     ' . ucwords(str_replace('_', ' ', $signal)) . '<br />
                                     ' . $latest_day->pair->getPairName() . '<br />
-                                    ' . $latest_day->start_date_time . ' <em>(+ 1 day)</em>
+                                    ' . $latest_day->date . '
                                 </p>' . "\n";
                             }
                         }

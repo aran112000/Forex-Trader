@@ -121,7 +121,7 @@ abstract class _base_analysis {
 
         return [
             'type' => $type,
-            'start_date_time' => $latest_day->start_date_time,
+            'date' => $latest_day->date,
             'pair' => $this->currency_pair,
             'entry' => $entry,
             'stop' => $stop,
