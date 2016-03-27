@@ -172,7 +172,7 @@ abstract class _base_analysis {
         $choppiness_index = new choppiness_index();
         $index = $choppiness_index->get($data);
 
-        return $index;
+        return round($index);
     }
 
     /**
@@ -199,7 +199,12 @@ abstract class _base_analysis {
 
         $last_two_data_points = array_slice($data, -2);
 
-        if ($last_two_data_points[0]->atr >= $last_two_data_points[1]->atr) {
+        $atr_1 = round($last_two_data_points[0]->atr);
+        $atr_2 = round($last_two_data_points[1]->atr);
+
+        if ($atr_1 === $atr_2) {
+            return 'sideways';
+        } else if ($atr_1 > $atr_2) {
             return 'down';
         } else {
             return 'up';
