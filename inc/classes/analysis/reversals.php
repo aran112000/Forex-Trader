@@ -79,6 +79,8 @@ class reversals extends _base_analysis {
                                     ' . $latest_day->pair->getPairName() . '<br />
                                     ' . $latest_day->start_date_time . ' <em>(+ 1 day)</em>
                                 </p>'."\n";
+
+
                             }
                         }
                     }
