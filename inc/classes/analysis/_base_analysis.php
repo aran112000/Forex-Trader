@@ -199,8 +199,8 @@ abstract class _base_analysis {
 
         $last_two_data_points = array_slice($data, -2);
 
-        $atr_1 = round($last_two_data_points[0]->atr);
-        $atr_2 = round($last_two_data_points[1]->atr);
+        $atr_1 = round($last_two_data_points[0]->atr, 4);
+        $atr_2 = round($last_two_data_points[1]->atr, 4);
 
         if ($atr_1 === $atr_2) {
             return 'sideways';
