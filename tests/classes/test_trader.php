@@ -91,7 +91,7 @@ class test_trader {
                 echo '<h1 style="margin:0 0 10px 0;">' . $pair->getPairName('/') . ' Results</h1>' . "\n";
                 echo '<p style="padding: 0 0 3px 0;margin:0">Daily candles analysed: ' . number_format($candles_inspected) . ' (' . number_format(($candles_inspected / 365), 1) . ' Yrs)</p>' . "\n";
                 echo '<p style="padding: 0 0 3px 0;margin:0">Entries identified: ' . $entries . ' (' . round((($entries / $candles_inspected) * 100), 2) . '%)</p>' . "\n";
-                echo '<p style="padding: 0 0 3px 0;margin:0">Entries triggered: ' . $valid_trades . ' (' . round((($valid_trades / $entries) * 100), 2) . '%)</p>' . "\n";
+                echo '<p style="padding: 0 0 3px 0;margin:0">Entries triggered: ' . $valid_trades . ($entries > 0 ? ' (' . round((($valid_trades / $entries) * 100), 2) . '%)' : '') . '</p>' . "\n";
                 echo '<p style="padding: 0 0 3px 0;margin:0">Winning trades: ' . $wins . ' (' . $win_percentage . '%)</p>' . "\n";
                 echo '<p style="padding: 0 0 3px 0;margin:0">Loosing trades: ' . $losses . ' (' . $loss_percentage . '%)</p>' . "\n";
                 echo '<p style="padding: 0 0 3px 0;margin:0">Gross profit: ' . number_format($pair_gross_profit, 2) . '%</p>' . "\n";
