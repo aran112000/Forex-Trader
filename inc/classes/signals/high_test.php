@@ -19,17 +19,14 @@ class high_test extends _signal {
 
         /**@var avg_price_data $last_period */
         $last_period = end($data);
-        $last_direction = $last_period->getDirection();
 
-        if ($direction === 'short' && ($last_direction === 'down' || $last_period === 'neutral')) {
-            $body_top = ($last_period->close > $last_period->open ? $last_period->close : $last_period->open);
+        $body_top = ($last_period->close > $last_period->open ? $last_period->close : $last_period->open);
 
-            $candle_top = abs($last_period->high - $body_top);
-            $candle_bottom = abs($body_top - $last_period->low);
+        $candle_top = abs($last_period->high - $body_top);
+        $candle_bottom = abs($body_top - $last_period->low);
 
-            if ($candle_top >= ($candle_bottom * 2)) {
-                return true;
-            }
+        if ($candle_top >= ($candle_bottom * 2)) {
+            return true;
         }
 
         return false;
