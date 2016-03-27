@@ -39,6 +39,26 @@ final class get {
     }
 
     /**
+     * @param array $full_data
+     * @param int   $average_period
+     *
+     * @return float
+     */
+    public static function averageCandleSize(array $full_data, int $average_period = 15): float {
+        $period_data = array_slice($full_data, -$average_period);
+
+        $sum = 0;
+        foreach ($period_data as $candle) {
+            /**@var avg_price_data $candle */
+            $candle_size = abs($candle->high - $candle->low);
+
+            $sum += $candle_size;
+        }
+
+        return ($sum / count($period_data));
+    }
+
+    /**
      * @param float  $a
      * @param float  $b
      * @param \_pair $pair
