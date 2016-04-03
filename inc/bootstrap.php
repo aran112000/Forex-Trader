@@ -11,6 +11,7 @@ if (strstr($_SERVER['HTTP_HOST'], 'aran.me.uk')) {
 set::define('live', $live);
 set::define('ip', get::ip());
 set::define('uri', $_SERVER['REQUEST_URI']);
+set::define('host', $_SERVER['HTTP_HOST']);
 set::define('cli', (php_sapi_name() === "cli"));
 
 if (!cli) {

@@ -1,7 +1,11 @@
 header {
-    height: 80px;
+    height: 130px;
     width: 100%;
     display: block;
+    margin-bottom: 15px;
+}
+header img {
+    margin: 25px 0;
 }
 footer {
     display: block;

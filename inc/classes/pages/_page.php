@@ -29,7 +29,7 @@ abstract class _page {
         $html = '<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Forex Trader</title>
+    <title>ForexTrader</title>
     <meta name="robots" content="noindex,nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css" />
@@ -39,7 +39,9 @@ abstract class _page {
 <body>
     <div class="container">
         <header>
-    
+            <a href="/" title="ForexTrader">
+                <img src="/images/logo-trans.png" alt="ForexTrader logo" height="80" />            
+            </a>    
         </header>';
 
         return $html;
