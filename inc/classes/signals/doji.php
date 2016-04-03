@@ -28,6 +28,10 @@ class doji extends _signal {
             if ($last_period->close >= $min_close && $last_period->close <= $max_close) {
                 $body_size = abs($last_period->open - $last_period->close);
 
+                if ($body_size == 0) {
+                    return true;
+                }
+
                 $body_percentage = (($body_size / $candle_size) * 100);
                 if ($body_percentage <= 25) {
                     return true;

@@ -9,16 +9,17 @@ require('inc/bootstrap.php');
     <title>Forex trader</title>
 </head>
 <body>
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="http://techanjs.org/techan.min.js"></script>
+<script src="/js/d3.v3.min.js"></script>
+<script src="/js/techan.min.js"></script>
 <?php
 if (!isset($_REQUEST['data'])) {
 ?>
 <h1>AUD/CAD</h1>
 <h2>Current account balance: &#163;<?= number_format(account::getBalance(), 4) ?></h2>
-<script src="http://192.168.1.95:8081/socket.io/socket.io.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script>
-    var socket = io('http://192.168.1.95:8081');
+    var server = <?=(live ? '/:8081' : 'http://192.168.1.95:8081')?>,
+        socket = io(server);
     socket.on('connect', function () {
         socket.on('price', function (data) {
             console.log(data);

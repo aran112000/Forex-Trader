@@ -11,6 +11,11 @@ class reversals extends _base_analysis {
     const OUTPUT_RESULTS = true;
 
     /**
+     * @var null|trend_lines
+     */
+    private $trend_lines = null;
+
+    /**
      * @var int
      */
     protected $data_fetch_size = 250;
@@ -45,6 +50,16 @@ class reversals extends _base_analysis {
     }
 
     /**
+     *
+     */
+    private function setTrendLines() {
+        if ($this->trend_lines === null) {
+            $this->trend_lines = new trend_lines();
+            $this->trend_lines->getLines($this->getData());
+        }
+    }
+
+    /**
      * @return bool|string
      */
     public function getHistoricalPriceDirection() {
@@ -55,6 +70,8 @@ class reversals extends _base_analysis {
      * @return bool
      */
     protected function isLongEntry(): bool {
+        $this->setTrendLines();
+
         $atr_direction = $this->getAtrDirection();
         if ($atr_direction === 'down' || $atr_direction === 'sideways') {
 
@@ -99,6 +116,8 @@ class reversals extends _base_analysis {
      * @return bool
      */
     protected function isShortEntry() {
+        $this->setTrendLines();
+
         $this->getHistoricalPriceDirection();
         $atr_direction = $this->getAtrDirection();
         if ($atr_direction === 'down' || $atr_direction === 'sideways') {

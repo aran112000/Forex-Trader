@@ -9,6 +9,8 @@ abstract class oanda_base {
 
     const DATE_TIME_FORMAT = 'UNIX';
 
+    const LIVE_TRADING = false;
+
     const ACCOUNT_ID = 3801954;
     const API_KEY = '292cc63cd1beb6d1cedd79145aa1e6d6-539708ca87ef48c291bb234e94bbff01';
 
@@ -35,7 +37,7 @@ abstract class oanda_base {
      */
     protected function getEndpoint(string $endpoint, array $fields = [], string $method = 'POST'): string {
         $endpoint = trim($endpoint, '/');
-        if (live) {
+        if (self::LIVE_TRADING) {
             $url = $this->live_endpoint . '/v' . self::API_VERSION . '/' . $endpoint;
         } else {
             $url = $this->demo_endpoint . '/v' . self::API_VERSION . '/' . $endpoint;
