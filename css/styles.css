@@ -1,0 +1,9 @@
+header {
+    height: 80px;
+    width: 100%;
+    display: block;
+}
+footer {
+    display: block;
+    margin: 20px 0;
+}

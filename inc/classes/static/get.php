@@ -5,6 +5,8 @@
  */
 final class get {
 
+    const HASH_SALT = 'aeauG%4xq$jTv&a_pEWQYmw^?ySw@vN*C@HVh^3gaeNZ_e&*5X';
+
     /**
      * @param array $data
      * @param int   $history_periods
@@ -118,5 +120,65 @@ final class get {
         }
 
         return $string;
+    }
+
+    /**
+     * @param string $data
+     *
+     * @return string
+     */
+    public static function hash(string $data): string {
+        return hash_hmac('sha512', $data, self::HASH_SALT);
+    }
+
+    /**
+     * @return string
+     */
+    public static function ip() {
+        if (defined('ip')) {
+            return ip;
+        }
+
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            // Request has been through a proxy (or two...)
+            $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            return trim($ips[0]);
+        }
+
+        return $_SERVER['REMOTE_ADDR'];
+    }
+
+
+    /**
+     * @param array  $list
+     * @param string $final_concatenation_word
+     *
+     * @return string
+     */
+    public static function array_to_sentence_list(array $list, string $final_concatenation_word = 'and'): string {
+        if (count($list) > 1) {
+            $last_element = array_pop($list);
+
+            return implode(', ', $list) . ' ' . $final_concatenation_word . ' ' . $last_element;
+        }
+
+        return implode(', ', $list);
+    }
+
+    /**
+     * @param array $attrs
+     *
+     * @return string
+     */
+    public static function attrs(array $attrs): string {
+        $return = '';
+        foreach ($attrs as $attr => $values) {
+            $value = (is_array($values) ? implode(' ', $values) : $values);
+            if (!empty($value) && !empty($attr)) {
+                $return .= ' ' . $attr . '="' . htmlentities($value) . '"';
+            }
+        }
+
+        return $return;
     }
 }
