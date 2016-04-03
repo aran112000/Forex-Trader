@@ -31,9 +31,7 @@ final class session {
             trigger_error('Failed to save session');
             return false;
         }
-
-        echo '<p><pre>' . print_r($_SESSION, true) . '</pre></p>';
-
+        
         self::checkSessionHijacked();
         self::$session_started = true;
 

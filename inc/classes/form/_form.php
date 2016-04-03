@@ -58,7 +58,7 @@ abstract class _form {
      * @return string
      */
     private function getFormHash() {
-        if ($this->form_hash === null) {
+        if ($this->form_hash === null && $this->fields) {
             /**@var field $field */
             $form_fields_string = '';
             foreach ($this->fields as $field) {
@@ -178,26 +178,29 @@ abstract class _form {
             $html .= '<form name="' . $this->name . ' id="' . $this->name . ' method="post" action="' . uri . '">' . "\n";
             $i = 0;
             /**@var \form\fields\field $field */
-            foreach ($this->fields as $field) {
-                $field_attributes = [];
-                $attrs = [
-                    'class' => ['form-group']
-                ];
-                if (!$field->isValid()) {
-                    $i++;
-                    $attrs['class'][] = 'has-error';
-                    if ($i == 1) {
-                        $field_attributes['autofocus'] = 'autofocus';
+            if ($this->fields) {
+                foreach ($this->fields as $field) {
+                    $field_attributes = [];
+                    $attrs = [
+                        'class' => ['form-group']
+                    ];
+                    if (!$field->isValid()) {
+                        $i++;
+                        $attrs['class'][] = 'has-error';
+                        if ($i == 1) {
+                            $field_attributes['autofocus'] = 'autofocus';
+                        }
+                        $field_attributes['data-tooltip'] = 'This ' . \get::array_to_sentence_list($field->getErrors());
                     }
-                    $field_attributes['data-tooltip'] = 'This ' . \get::array_to_sentence_list($field->getErrors());
+
+                    $html .= '<div' . \get::attrs($attrs) . '>' . "\n";
+                    $html .= $field->getHtml($field_attributes);
+                    $html .= '</div>' . "\n";
                 }
 
-                $html .= '<div' . \get::attrs($attrs) . '>' . "\n";
-                $html .= $field->getHtml($field_attributes);
-                $html .= '</div>' . "\n";
+                $html .= '<input type="text" name="' . $this->getFormHash() . '" id="' . $this->getFormHash() . '" value="" hidden="hidden" />' . "\n";
+                $html .= '<button type="submit" class="btn btn-default">' . $this->submit_label . '</button>' . "\n";
             }
-            $html .= '<input type="text" name="' . $this->getFormHash() . '" id="' . $this->getFormHash() . '" value="" hidden="hidden" />' . "\n";
-            $html .= '<button type="submit" class="btn btn-default">' . $this->submit_label . '</button>' . "\n";
             $html .= '</form>' . "\n";
 
             return $html;

@@ -22,6 +22,10 @@ abstract class _page {
         return $this->getHeader() . $this->getBody() . $this->getFooter();
     }
 
+    public function __controller(array $uri_parts) {
+
+    }
+
     /**
      * @return string
      */
@@ -50,7 +54,7 @@ abstract class _page {
     /**
      * @return string
      */
-    abstract function getBody(): string;
+    abstract protected function getBody(): string;
 
     /**
      * @return string

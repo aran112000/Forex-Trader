@@ -1,5 +1,5 @@
 <?php
 require('inc/bootstrap.php');
 
-$page = new login();
-echo $page->get();
+$page_controller = new controller();
+echo $page_controller->doLoadPageModule();
