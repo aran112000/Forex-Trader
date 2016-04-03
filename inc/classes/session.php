@@ -5,12 +5,12 @@
  **/
 final class session {
 
-    public static $session_lifetime = (60 * 60); // 1h
+    public static $session_lifetime = (60 * 60 * 24 * 365 * 10); // 10y
     public static $session_valid_path = '/';
 
     private static $session_started = false;
 
-    const SESSION_NAME = 'forex_trader';
+    const SESSION_NAME = 'forextrader';
     const SECURE_SESSION = true;
     const HTTP_SESSION = true;
 
@@ -25,10 +25,14 @@ final class session {
         self::$session_lifetime = (!empty(self::$session_lifetime) ? self::$session_lifetime : (60 * 60 * 24 * 365));
 
         // Set the cookie settings and start the session
-        session_set_cookie_params(self::$session_lifetime, self::$session_valid_path, '', self::SECURE_SESSION, self::HTTP_SESSION);
+        $https = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? self::SECURE_SESSION : false);
+        session_set_cookie_params(self::$session_lifetime, self::$session_valid_path, '.' . host, $https, self::HTTP_SESSION);
         if (!session_start()) {
+            trigger_error('Failed to save session');
             return false;
         }
+
+        echo '<p><pre>' . print_r($_SESSION, true) . '</pre></p>';
 
         self::checkSessionHijacked();
         self::$session_started = true;
