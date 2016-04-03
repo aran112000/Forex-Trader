@@ -1,22 +1,24 @@
 <?php
 require('inc/bootstrap.php');
 
-if ($res = db::query('SELECT * FROM pricing_1d WHERE pair=\'AUD_CAD\' ORDER BY timekey ASC')) {
-    $json = [];
-    if (db::num($res)) {
-        while ($row = db::fetch($res)) {
-            $json[] = [
-                'TimeKey' => $row['timekey'],
-                'Date' => date('d/m/Y H:i:s', strtotime($row['entry_time'])),
-                'Open' => round($row['open'], 5),
-                'Close' => round($row['close'], 5),
-                'High' => round($row['high'], 5),
-                'Low' => round($row['low'], 5),
-                'Volume' => (int) $row['volume'],
-            ];
-        }
-    }
+$json = [];
 
-    header('Content-Type: application/json');
-    die(json_encode($json));
+$pair = new aud_cad();
+if ($rows = $pair->getData(365)) {
+    foreach ($rows as $row) {
+        $unix_timestamp = get::strtotime_from_uk_format($row->date);
+
+        $json[] = [
+            'TimeKey' => floor($unix_timestamp / 86400),
+            'Date' => date('d/m/Y H:i:s', $unix_timestamp),
+            'Open' => $row->open,
+            'Close' => $row->close,
+            'High' => $row->high,
+            'Low' => $row->low,
+            'Volume' => $row->volume,
+        ];
+    }
 }
+
+header('Content-Type: application/json');
+die(json_encode($json));

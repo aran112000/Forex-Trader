@@ -39,15 +39,24 @@ final class get {
     }
 
     /**
+     * @param string $uk_date_string
+     *
+     * @return string
+     */
+    public static function strtotime_from_uk_format(string $uk_date_string): string {
+        list($day, $month, $year) = explode('/', $uk_date_string);
+
+        return strtotime($month . '/' . $day . '/' . $year);
+    }
+
+    /**
      * @param string $date_string
      * @param string $uk_date_string
      *
      * @return string
      */
     public static function date(string $date_string, string $uk_date_string): string {
-        list($day, $month, $year) = explode('/', $uk_date_string);
-
-        return date($date_string, strtotime($month . '/' . $day . '/' . $year));
+        return date($date_string, self::strtotime_from_uk_format($uk_date_string));
     }
 
     /**

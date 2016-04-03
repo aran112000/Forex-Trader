@@ -10,7 +10,7 @@ abstract class _pair {
     public $base_currency = null;
     public $quote_currency = null;
 
-    public $data_fetch_time = 'M1';
+    public $data_fetch_time = 'D';
 
     /**
      * _pair constructor.

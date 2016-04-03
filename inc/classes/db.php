@@ -16,44 +16,37 @@ class db {
     static private $has_table_cache = [];
 
     /**
-     * @param string $username
-     * @param string $password
-     * @param string $database
-     * @param string $server
-     * @param int    $port
-     * @param bool   $die_on_fail
+     *
      */
-    public static function connect($username = 'root', $password = 'Issj598*', $database = 'forex', $server = 'localhost', $port = 3306, $die_on_fail = true) {
+    public static function connect() {
+        $username = 'root';
+        $password = 'Issj598*';
+
+        if (live) {
+            $database = 'trader';
+            $server = 'trader.c23njnxbttms.eu-west-1.rds.amazonaws.com';
+        } else {
+            $database = 'forex';
+            $server = 'localhost';
+        }
+        $port = 3306;
+        $die_on_fail = true;
+
         $global_var = 'db';
-        $db_type = 'mysql';
         static::$global_var = $global_var;
-        $master_server = (!empty($server) ? $server : 'localhost');
 
         static::$usr[static::$global_var] = $username; // Used for detecting CMS login
         static::$db_name = $database;
 
-        $connection_opts = [
-            PDO::ATTR_PERSISTENT => true,
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::FETCH_PROPS_LATE => true,
-        ];
-        if (defined('external') && external === true) {
-            $connection_opts[PDO::ATTR_TIMEOUT] = 3600; // 1 hour timeout
-            $connection_opts[PDO::ATTR_PERSISTENT] = true;
-        }
-
-        if (defined('charset')) {
-            $charset = str_replace('-', '', strtolower(charset));
-            if ($charset == 'utf8') {
-                $connection_opts[PDO::MYSQL_ATTR_INIT_COMMAND] = 'SET NAMES utf8';
-            }
-        }
-
         try {
-            self::$connection = new PDO($db_type . ':host=' . $master_server . ';port=' . $port . ';dbname=' . $database, $username, $password, $connection_opts);
+            self::$connection = new PDO('mysql:host=' . $server . ';port=' . $port . ';dbname=' . $database, $username, $password, [
+                PDO::ATTR_PERSISTENT => true,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::FETCH_PROPS_LATE => true,
+            ]);
         } catch (PDOException $e) {
             if ($die_on_fail) {
-                trigger_error('<p>Site failed to connect to master database, please try again shortly.</p>' . (defined('dev') && dev ? '<p>' . $e->getMessage() . '</p>' : ''));
+                trigger_error('<p>Site failed to connect to master database, please try again shortly.</p><p>' . $e->getMessage() . '</p>');
                 die();
             } else {
                 throw($e);
@@ -61,6 +54,9 @@ class db {
         }
     }
 
+    /**
+     *
+     */
     public static function disable_triggers() {
         static::query('SET @TRIGGER_CHECKS = false');
     }
@@ -270,6 +266,9 @@ class db {
         return $db_class->getMethod($calling_method)->invokeArgs(null, $args);
     }
 
+    /**
+     *
+     */
     public static function enable_triggers() {
         static::query('SET @TRIGGER_CHECKS = true');
     }
@@ -551,6 +550,12 @@ class db {
         return ($dbres && db::num($dbres) == 1);
     }
 
+    /**
+     * @param      $table
+     * @param null $alias
+     *
+     * @return string
+     */
     public static function alias($table, $alias = null) {
         if (strpos($table, '.') !== false) {
             return $table;
@@ -699,6 +704,9 @@ class array_iterator extends ArrayIterator {
         return false;
     }
 
+    /**
+     * @return $this
+     */
     public function closeCursor() {
         return $this;
     }
