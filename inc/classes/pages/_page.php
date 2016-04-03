@@ -61,7 +61,7 @@ abstract class _page {
      */
     protected function getFooter(): string {
         $html = '<footer>';
-        $html .= '<small>&copy; ' . date('Y') . ' Forex Trader | Developed by Aran Reeks | All rights reserved.</small>';
+        $html .= '<small>&copy; ' . date('Y') . ' ForexTrader | Developed by Aran Reeks | All rights reserved.</small>';
         $html .= '</footer>';
         $html .= '</div>';
         if (!empty(self::$js_files)) {

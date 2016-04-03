@@ -20,9 +20,12 @@ class settings_form extends \form\_form {
     private function getSettings(): array {
         if ($this->settings === null) {
             $this->settings = [];
-            if ($res = db::query('SELECT `key`, `value` FROM settings LIMIT 1')) {
+            if ($res = db::query('SELECT `key`, `value`, field_type FROM settings')) {
                 while ($row = db::fetch($res)) {
-                    $this->settings[$row['key']] = $row['value'];
+                    $this->settings[$row['key']] = [
+                        'value' => $row['value'],
+                        'field_type' => $row['field_type'],
+                    ];
                 }
             }
         }
@@ -35,8 +38,12 @@ class settings_form extends \form\_form {
      */
     private function getSettingFields(): array {
         $fields = [];
-        foreach ($this->getSettings() as $key => $value) {
-            $fields[] = new \form\fields\field_string($key);
+        foreach ($this->getSettings() as $key => $details) {
+            $field_type = '\form\fields\field_' . $details['field_type'];
+            $field = new $field_type($key);
+            $field->value = $details['value'];
+
+            $fields[] = $field;
         }
 
         return $fields;
@@ -46,9 +53,15 @@ class settings_form extends \form\_form {
      *
      */
     private function doUpdateSettings() {
-        foreach ($this->getSettings() as $field) {
-
+        foreach ($this->getSettings() as $field_name => $value) {
+            bulk_db::add_query('settings', [
+                'key' => $field_name,
+                'value' => $this->getField($field_name)->getValue(false),
+            ]);
         }
+        bulk_db::do_process_queries();
+
+        return true;
     }
 
     /**

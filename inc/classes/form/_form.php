@@ -20,6 +20,7 @@ abstract class _form {
     private $name = null;
     private $form_hash = null;
     private $form_submitted = null;
+    private $submit_in_process = false;
 
     /**
      * form constructor.
@@ -165,7 +166,9 @@ abstract class _form {
      * @return \form\string
      */
     public function getHtml(): string {
-        if ($this->isSubmitted() && $this->isValid()) {
+        if ($this->isSubmitted() && $this->isValid() && !$this->submit_in_process) {
+            $this->submit_in_process = true;
+            
             return $this->doSubmit();
         } else {
             $html = '';
