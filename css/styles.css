@@ -1,8 +1,11 @@
+body {
+    padding-top: 50px;
+}
 header {
     margin-bottom: 15px;
 }
-header img {
-    margin: 25px 0;
+header .navbar-brand {
+    padding: 10px 25px;
 }
 footer {
     display: block;

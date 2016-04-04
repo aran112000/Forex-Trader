@@ -12,7 +12,10 @@ abstract class _page {
     /**
      * @var array
      */
-    private static $js_files = [];
+    private static $js_files = [
+        '//ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js',
+        '/js/bootstrap.min.js',
+    ];
 
     /**
      * @var array
@@ -39,16 +42,33 @@ abstract class _page {
      * @return string
      */
     public function getNavigation(): string {
+        $html = '<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/"><img src="/images/logo-trans.png" alt="ForexTrader logo" height="30" /></a>
+    </div>'."\n\n";
+
         if (\user::isLoggedIn()) {
-            return '<ul class="nav nav-tabs">
-  <li role="presentation"' . (uri == '/' ? ' class="active"' : '') . '><a href="/">Dashboard</a></li>
-  <li role="presentation"' . (uri == '/trade-history' ? ' class="active"' : '') . '><a href="/trade-history">History</a></li>
-  <li role="presentation"' . (uri == '/settings' ? ' class="active"' : '') . '><a href="/settings">Settings</a></li>
-  <li role="presentation"' . (uri == '/logout' ? ' class="active"' : '') . '><a href="/logout">Logout</a></li>
-</ul>';
+            $html .= '<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li role="presentation"' . (uri == '/' ? ' class="active"' : '') . '><a href="/">Dashboard</a></li>
+          <li role="presentation"' . (uri == '/trade-history' ? ' class="active"' : '') . '><a href="/trade-history">History</a></li>
+          <li role="presentation"' . (uri == '/settings' ? ' class="active"' : '') . '><a href="/settings">Settings</a></li>
+          <li role="presentation"' . (uri == '/logout' ? ' class="active"' : '') . '><a href="/logout">Logout</a></li>
+        </ul>
+    </div>'."\n";
         }
 
-        return '';
+        $html .= '</div>
+</nav>';
+
+        return $html;
     }
 
     /**
@@ -68,9 +88,6 @@ abstract class _page {
 <body>
     <div class="container">
         <header class="clearfix">
-            <a href="/" title="ForexTrader">
-                <img src="/images/logo-trans.png" alt="ForexTrader logo" height="80" />            
-            </a> 
             ' . $this->getNavigation() . '
         </header>';
 
