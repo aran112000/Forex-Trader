@@ -44,23 +44,25 @@ abstract class _page {
     public function getNavigation(): string {
         $html = '<nav class="navbar navbar-default navbar-fixed-top">
   <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+    <div class="navbar-header">'."\n";
+        if (\user::isLoggedIn()) {
+            $html .= '<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
         <span class="sr-only">Toggle navigation</span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="/"><img src="/images/logo-trans.png" alt="ForexTrader logo" height="30" /></a>
+      </button>' . "\n";
+        }
+        $html .= '<a class="navbar-brand" href="/"><img src="/images/logo-trans.png" alt="ForexTrader logo" height="30" /></a>
     </div>'."\n\n";
 
         if (\user::isLoggedIn()) {
             $html .= '<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
-          <li role="presentation"' . (uri == '/' ? ' class="active"' : '') . '><a href="/">Dashboard</a></li>
-          <li role="presentation"' . (uri == '/trade-history' ? ' class="active"' : '') . '><a href="/trade-history">History</a></li>
-          <li role="presentation"' . (uri == '/settings' ? ' class="active"' : '') . '><a href="/settings">Settings</a></li>
-          <li role="presentation"' . (uri == '/logout' ? ' class="active"' : '') . '><a href="/logout">Logout</a></li>
+          <li role="presentation"' . (uri == '/' ? ' class="active"' : '') . '><a href="/"><i class="glyphicon glyphicon-th"></i> Dashboard</a></li>
+          <li role="presentation"' . (uri == '/trade-history' ? ' class="active"' : '') . '><a href="/trade-history"><i class="glyphicon glyphicon-signal"> </i> History</a></li>
+          <li role="presentation"' . (uri == '/settings' ? ' class="active"' : '') . '><a href="/settings"><i class="glyphicon glyphicon-cog"> </i> Settings</a></li>
+          <li role="presentation"' . (uri == '/logout' ? ' class="active"' : '') . '><a href="/logout"><i class="glyphicon glyphicon-lock"> </i> Logout</a></li>
         </ul>
     </div>'."\n";
         }

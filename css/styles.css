@@ -15,3 +15,7 @@ footer {
 footer small {
     font-size: 10px;
 }
+
+.glyphicon {
+    width: 18px;
+}
