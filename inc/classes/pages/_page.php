@@ -39,9 +39,9 @@ abstract class _page {
     public function getNavigation(): string {
         if (user::isLoggedIn()) {
             return '<ul class="nav nav-tabs">
-  <li role="presentation" class="active"><a href="/">Dashboard</a></li>
-  <li role="presentation"><a href="/settings">Settings</a></li>
-  <li role="presentation"><a href="/logout">Logout</a></li>
+  <li role="presentation"' . (uri == '/' ? ' class="active"' : '') . '><a href="/">Dashboard</a></li>
+  <li role="presentation"' . (uri == '/settings' ? ' class="active"' : '') . '><a href="/settings">Settings</a></li>
+  <li role="presentation"' . (uri == '/logout' ? ' class="active"' : '') . '><a href="/logout">Logout</a></li>
 </ul>';
         }
 
