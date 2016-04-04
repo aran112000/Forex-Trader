@@ -34,7 +34,12 @@ class login_form extends \form\_form {
      * @return mixed
      */
     function doSubmit(): string {
-        return 'Welcome back ' . user::get()['first_name'];
+        $redirect_url = '/dashboard';
+        if (isset($_REQUEST['r'])) {
+            $redirect_url = urldecode($_REQUEST['r']);
+        }
+        
+        header('location: ' . $redirect_url);
     }
 
     /**
