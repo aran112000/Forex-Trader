@@ -34,19 +34,6 @@ class field_bool extends field {
      */
     public function getHtml(array $field_attributes = []): string {
         $name = $this->getName();
-
-        $attributes = [
-            'name' => $name,
-            'id' => $name,
-            'aria-required' => ($this->required ? 'true' : 'false'),
-        ];
-        if (!$this->isValid()) {
-            $attributes['aria-invalid'] = 'true';
-        }
-        if (!empty($field_attributes)) {
-            $attributes = array_merge($attributes, $field_attributes);
-        }
-
         $field_value = $this->getValue();
 
         $return = '<label for="' . $name . '" class="control-label">' . $this->label . ($this->required ? ' <span class="required_field">*</span>' : '') . '</label>'."\n";

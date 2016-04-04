@@ -168,7 +168,7 @@ abstract class _form {
     public function getHtml(): string {
         if ($this->isSubmitted() && $this->isValid() && !$this->submit_in_process) {
             $this->submit_in_process = true;
-            
+
             return $this->doSubmit();
         } else {
             $html = '';
