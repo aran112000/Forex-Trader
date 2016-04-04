@@ -1,9 +1,11 @@
 <?php
 
+namespace page;
+
 /**
- * Class error_page
+ * Class error
  */
-class error_page extends _page {
+class error extends _page {
 
     /**
      * @return string

@@ -1,15 +1,17 @@
 <?php
 
+namespace page;
+
 /**
- * Class settings_page
+ * Class settings
  */
-class settings_page extends _page {
+class settings extends _page {
 
     /**
      * @return string
      */
     function getBody(): string {
-        $settings = new settings_form();
+        $settings = new \settings_form();
 
         return $settings->getHtml();
     }

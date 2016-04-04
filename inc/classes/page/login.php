@@ -1,9 +1,11 @@
 <?php
 
+namespace page;
+
 /**
- * Class login_page
+ * Class login
  */
-class login_page extends _page {
+class login extends _page {
 
     protected $requires_login = false;
 
@@ -11,8 +13,8 @@ class login_page extends _page {
      * @return string
      */
     function getBody(): string {
-        if (!user::isLoggedIn()) {
-            $login_form = new login_form();
+        if (!\user::isLoggedIn()) {
+            $login_form = new \login_form();
 
             return $login_form->getHtml();
         } else {

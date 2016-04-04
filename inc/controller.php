@@ -16,22 +16,22 @@ final class controller {
         $page_class = null;
         if (isset($this->uri_parts[0]) && $this->uri_parts[0] !== '') {
             // Module
-            if (class_exists($this->uri_parts[0] . '_page')) {
-                $page_class = $this->uri_parts[0] . '_page';
+            if (class_exists('page\\' . $this->uri_parts[0])) {
+                $page_class = 'page\\' . $this->uri_parts[0];
             }
         } else {
             if (user::isLoggedIn()) {
-                $page_class = 'dashboard_page';
+                $page_class = 'page\\dashboard';
             } else {
-                $page_class = 'login_page';
+                $page_class = 'page\\login';
             }
         }
 
         if ($page_class === null) {
-            $page_class = 'error_page';
+            $page_class = 'page\\error';
         }
 
-        /**@var _page $class*/
+        /**@var page\_page $class*/
         $class = new $page_class();
         $class->__controller($this->uri_parts);
 

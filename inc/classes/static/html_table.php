@@ -28,7 +28,7 @@ class html_table {
     <tr>'."\n";
 
         foreach ($headers as $header) {
-            $html .= '<th>' . $header . '</th>'."\n";
+            $html .= '<th class="text-center">' . $header . '</th>'."\n";
         }
 
         $html .= '
@@ -39,7 +39,7 @@ class html_table {
         foreach ($rows as $row) {
             $html .= '<tr>'."\n";
             foreach ($row as $value) {
-                $html .= '<td>' . $value . '</td>'."\n";
+                $html .= '<td class="text-center">' . $value . '</td>'."\n";
             }
             $html .= '</tr>'."\n";
         }

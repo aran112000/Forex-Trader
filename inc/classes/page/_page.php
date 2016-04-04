@@ -1,5 +1,7 @@
 <?php
 
+namespace page;
+
 /**
  * Class _page
  */
@@ -28,7 +30,7 @@ abstract class _page {
      * @param array $uri_parts
      */
     public function __controller(array $uri_parts) {
-        if ($this->requires_login && !user::isLoggedIn()) {
+        if ($this->requires_login && !\user::isLoggedIn()) {
             header('location: /?r=' . urlencode(uri));
         }
     }
@@ -37,7 +39,7 @@ abstract class _page {
      * @return string
      */
     public function getNavigation(): string {
-        if (user::isLoggedIn()) {
+        if (\user::isLoggedIn()) {
             return '<ul class="nav nav-tabs">
   <li role="presentation"' . (uri == '/' ? ' class="active"' : '') . '><a href="/">Dashboard</a></li>
   <li role="presentation"' . (uri == '/settings' ? ' class="active"' : '') . '><a href="/settings">Settings</a></li>

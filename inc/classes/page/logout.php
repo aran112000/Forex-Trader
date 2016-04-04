@@ -1,8 +1,18 @@
 <?php
-final class logout_page extends _page {
 
+namespace page;
+
+/**
+ * Class logout
+ * @package page
+ */
+class logout extends _page {
+
+    /**
+     * @param array $uri_parts
+     */
     public function __controller(array $uri_parts) {
-        if (session::stop()) {
+        if (\session::stop()) {
             header('location: /');
         }
     }
