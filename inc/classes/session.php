@@ -31,11 +31,23 @@ final class session {
             trigger_error('Failed to save session');
             return false;
         }
-        
+
         self::checkSessionHijacked();
         self::$session_started = true;
 
         return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function stop(): bool {
+        if (!self::$session_started) {
+            // Only do the minimal work to initialise the session
+            session_start();
+        }
+
+        return session_destroy();
     }
 
     /**
