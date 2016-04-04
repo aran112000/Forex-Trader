@@ -47,7 +47,6 @@ class user {
                 }
             }
 
-            trigger_error('Unsetting session');
             session::unset('user_details');
         }
 
