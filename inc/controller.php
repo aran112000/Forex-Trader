@@ -9,7 +9,7 @@ final class controller {
 
     private function setUriParts() {
         $uri_parts = explode('?', uri, 2); // Remove any query string from the URI
-        $this->uri_parts = explode('/', trim($uri_parts[0], '/ '));
+        $this->uri_parts = explode('/', trim(str_replace('-', '_', $uri_parts[0]), '/ '));
     }
 
     public function doLoadPageModule(): string {
