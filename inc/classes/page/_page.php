@@ -86,7 +86,7 @@ abstract class _page {
      * @return string
      */
     protected function getFooter(): string {
-        $html = '<footer>';
+        $html = '<footer class="text-center">';
         $html .= '<small>&copy; ' . date('Y') . ' ForexTrader | Developed by Aran Reeks | All rights reserved.</small>';
         $html .= '</footer>';
         $html .= '</div>';
