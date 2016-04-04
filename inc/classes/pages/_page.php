@@ -39,7 +39,7 @@ abstract class _page {
     public function getNavigation(): string {
         if (user::isLoggedIn()) {
             return '<ul class="nav nav-tabs">
-  <li role="presentation" class="active"><a href="/dashboard">Dashboard</a></li>
+  <li role="presentation" class="active"><a href="/">Dashboard</a></li>
   <li role="presentation"><a href="/settings">Settings</a></li>
   <li role="presentation"><a href="/logout">Logout</a></li>
 </ul>';

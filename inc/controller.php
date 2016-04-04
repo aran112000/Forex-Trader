@@ -20,7 +20,11 @@ final class controller {
                 $page_class = $this->uri_parts[0] . '_page';
             }
         } else {
-            $page_class = 'login_page';
+            if (user::isLoggedIn()) {
+                $page_class = 'dashboard_page';
+            } else {
+                $page_class = 'login_page';
+            }
         }
 
         if ($page_class === null) {

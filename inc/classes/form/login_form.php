@@ -34,11 +34,11 @@ class login_form extends \form\_form {
      * @return mixed
      */
     function doSubmit(): string {
-        $redirect_url = '/dashboard';
+        $redirect_url = '/';
         if (isset($_REQUEST['r'])) {
             $redirect_url = urldecode($_REQUEST['r']);
         }
-        
+
         header('location: ' . $redirect_url);
     }
 
