@@ -8,7 +8,8 @@ final class controller {
     }
 
     private function setUriParts() {
-        $this->uri_parts = explode('/', trim(uri, '/ '));
+        $uri_parts = explode('?', uri, 2); // Remove any query string from the URI
+        $this->uri_parts = explode('/', trim($uri_parts[0], '/ '));
     }
 
     public function doLoadPageModule(): string {
