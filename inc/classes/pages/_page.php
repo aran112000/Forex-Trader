@@ -5,6 +5,8 @@
  */
 abstract class _page {
 
+    protected $requires_login = true;
+
     /**
      * @var array
      */
@@ -22,8 +24,28 @@ abstract class _page {
         return $this->getHeader() . $this->getBody() . $this->getFooter();
     }
 
+    /**
+     * @param array $uri_parts
+     */
     public function __controller(array $uri_parts) {
+        if ($this->requires_login && !user::isLoggedIn()) {
+            header('location: /?r=' . urlencode(uri));
+        }
+    }
 
+    /**
+     * @return string
+     */
+    public function getNavigation(): string {
+        if (user::isLoggedIn()) {
+            return '<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a href="/dashboard">Dashboard</a></li>
+  <li role="presentation"><a href="/settings">Settings</a></li>
+  <li role="presentation"><a href="/logout">Logout</a></li>
+</ul>';
+        }
+
+        return '';
     }
 
     /**
@@ -42,10 +64,11 @@ abstract class _page {
 </head>
 <body>
     <div class="container">
-        <header>
+        <header class="clearfix">
             <a href="/" title="ForexTrader">
                 <img src="/images/logo-trans.png" alt="ForexTrader logo" height="80" />            
-            </a>    
+            </a> 
+            ' . $this->getNavigation() . '
         </header>';
 
         return $html;

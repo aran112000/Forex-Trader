@@ -5,6 +5,8 @@
  */
 class login_page extends _page {
 
+    protected $requires_login = false;
+
     /**
      * @return string
      */
