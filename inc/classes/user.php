@@ -87,6 +87,8 @@ class user {
      * @return array
      */
     public static function get(): array {
+        self::isLoggedIn();
+        
         if (self::$user === null) {
             return [];
         }
