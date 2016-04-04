@@ -42,7 +42,7 @@ abstract class _page {
         if (\user::isLoggedIn()) {
             return '<ul class="nav nav-tabs">
   <li role="presentation"' . (uri == '/' ? ' class="active"' : '') . '><a href="/">Dashboard</a></li>
-  <li role="presentation"' . (uri == '/trade-history' ? ' class="active"' : '') . '><a href="/trade-history">Trade History</a></li>
+  <li role="presentation"' . (uri == '/trade-history' ? ' class="active"' : '') . '><a href="/trade-history">History</a></li>
   <li role="presentation"' . (uri == '/settings' ? ' class="active"' : '') . '><a href="/settings">Settings</a></li>
   <li role="presentation"' . (uri == '/logout' ? ' class="active"' : '') . '><a href="/logout">Logout</a></li>
 </ul>';
