@@ -198,6 +198,9 @@ abstract class _form {
 
                     $html .= '<div' . \get::attrs($attrs) . '>' . "\n";
                     $html .= $field->getHtml($field_attributes);
+                    if ($field->post_text !== null) {
+                        $html .= '<span id="helpBlock" class="help-block">' . $field->post_text . '</span>';
+                    }
                     $html .= '</div>' . "\n";
                 }
 
