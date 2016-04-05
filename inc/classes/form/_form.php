@@ -33,14 +33,27 @@ abstract class _form {
     }
 
     /**
+     *
+     */
+    public function doAjaxSubmit() {
+        if ($this->isSubmitted() && $this->isValid() && !$this->submit_in_process) {
+            $this->submit_in_process = true;
+
+            \ajax::addUpdateHtml($this->doSubmit());
+        } else {
+            \ajax::addUpdateHtml($this->getHtml());
+        }
+    }
+
+    /**
      * @return bool|null
      */
     protected function isSubmitted() {
         if ($this->form_submitted === null) {
-            if (isset($_POST[$this->getFormHash()])) {
+            if (isset($_REQUEST[$this->getFormHash()])) {
                 /**@var field $field */
                 foreach ($this->fields as $field) {
-                    if (!isset($_POST[$field->getName()])) {
+                    if (!isset($_REQUEST[$field->getName()])) {
                         $this->form_submitted = false;
                         break;
                     }
@@ -129,7 +142,7 @@ abstract class _form {
                 // We also include a special hidden field on all our forms to try and detect bots auto filling the form
                 // these fields are hidden from visibility in the form so should be impossible for a user to fill in under
                 // normal website usage.
-                if (!empty($_POST[$this->getFormHash()])) {
+                if (!empty($_REQUEST[$this->getFormHash()])) {
                     $this->errors[] = 'this form submission has been detected as being automated and as such, your form submission has been blocked.';
                 }
             }
@@ -178,7 +191,7 @@ abstract class _form {
             </div>';
             }
 
-            $html .= '<form name="' . $this->name . ' id="' . $this->name . ' method="post" action="' . uri . '">' . "\n";
+            $html .= '<form name="' . $this->name . '" id="' . $this->name . '" method="post" action="' . uri . '" data-module="' . get_called_class() . '" data-action="doAjaxSubmit">' . "\n";
             $i = 0;
             /**@var \form\fields\field $field */
             if ($this->fields) {

@@ -17,8 +17,8 @@ class field_email extends field {
      */
     public function getValue(bool $allow_default_value = true): string {
         $field_name = $this->getName();
-        if (isset($_POST[$field_name]) && !empty($_POST[$field_name])) {
-            return \clean::email($_POST[$field_name]);
+        if (isset($_REQUEST[$field_name]) && !empty($_REQUEST[$field_name])) {
+            return \clean::email($_REQUEST[$field_name]);
         } else if ($allow_default_value && $this->value !== null) {
             return \clean::email($this->value);
         }

@@ -21,7 +21,7 @@ class field_url extends field {
         $value = parent::getValue($allow_default_value);
         $field_name = $this->getName();
 
-        if (isset($_POST[$field_name]) && !empty($_POST[$field_name])) {
+        if (isset($_REQUEST[$field_name]) && !empty($_REQUEST[$field_name])) {
             if (!strstr($value, 'https://') && !strstr($value, 'http://')) {
                 $value = 'http://' . $value;
             }

@@ -79,11 +79,11 @@ abstract class field {
      */
     public function getValue(bool $allow_default_value = true): string {
         $field_name = $this->getName();
-        if (isset($_POST[$field_name]) && !empty($_POST[$field_name])) {
-            if ($this->filter_validate_constant !== null && filter_input(INPUT_POST, $field_name, constant($this->filter_validate_constant))) {
-                return filter_input(INPUT_POST, $field_name, constant($this->filter_sanitise_constant));
+        if (isset($_REQUEST[$field_name]) && !empty($_REQUEST[$field_name])) {
+            if ($this->filter_validate_constant !== null && filter_input(INPUT_GET, $field_name, constant($this->filter_validate_constant))) {
+                return filter_input(INPUT_GET, $field_name, constant($this->filter_sanitise_constant));
             } else {
-                return filter_input(INPUT_POST, $field_name, FILTER_SANITIZE_STRING);
+                return filter_input(INPUT_GET, $field_name, FILTER_SANITIZE_STRING);
             }
         } else if ($allow_default_value && $this->value !== null) {
             return $this->value;

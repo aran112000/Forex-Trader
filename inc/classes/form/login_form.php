@@ -39,7 +39,8 @@ class login_form extends \form\_form {
             $redirect_url = urldecode($_REQUEST['r']);
         }
 
-        header('location: ' . $redirect_url);
+        \ajax::setRedirectUrl($redirect_url);
+        \ajax::doServe();
     }
 
     /**

@@ -70,6 +70,7 @@ class settings_form extends \form\_form {
     protected function doSubmit(): string {
         $this->doUpdateSettings();
 
-        return '<div class="alert alert-success" role="alert">Your changes have been saved</div>' . $this->getHtml();
+        \ajax::addUpdateHtml('<div class="alert alert-success" role="alert">Your changes have been saved</div>' . $this->getHtml());
+        \ajax::doServe();
     }
 }

@@ -15,6 +15,7 @@ abstract class _page {
     private static $js_files = [
         '//ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js',
         '/js/bootstrap.min.js',
+        '/js/script.js',
     ];
 
     /**
