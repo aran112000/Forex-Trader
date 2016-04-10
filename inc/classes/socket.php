@@ -17,14 +17,14 @@ class socket {
      */
     private static function init() {
         if (self::$server === null) {
-            require(root . '/inc/external/elephant.io/src/Client.php');
-            require(root . '/inc/external/elephant.io/src/EngineInterface.php');
-            require(root . '/inc/external/elephant.io/src/Engine/AbstractSocketIO.php');
-            require(root . '/inc/external/elephant.io/src/Engine/SocketIO/Version1X.php');
-            require(root . '/inc/external/elephant.io/src/Engine/SocketIO/Session.php');
-            require(root . '/inc/external/elephant.io/src/AbstractPayload.php');
-            require(root . '/inc/external/elephant.io/src/Payload/Encoder.php');
-            require(root . '/inc/external/elephant.io/src/Payload/Decoder.php');
+            require(root . '/libs/elephant.io/src/Client.php');
+            require(root . '/libs/elephant.io/src/EngineInterface.php');
+            require(root . '/libs/elephant.io/src/Engine/AbstractSocketIO.php');
+            require(root . '/libs/elephant.io/src/Engine/SocketIO/Version1X.php');
+            require(root . '/libs/elephant.io/src/Engine/SocketIO/Session.php');
+            require(root . '/libs/elephant.io/src/AbstractPayload.php');
+            require(root . '/libs/elephant.io/src/Payload/Encoder.php');
+            require(root . '/libs/elephant.io/src/Payload/Decoder.php');
 
             self::$server = new ElephantIO\Client(new ElephantIO\Engine\SocketIO\Version1X(self::SERVER));
             self::$server->initialize();
