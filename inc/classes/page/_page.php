@@ -7,6 +7,8 @@ namespace page;
  */
 abstract class _page {
 
+    use \seo;
+
     protected $requires_login = true;
 
     /**
@@ -27,7 +29,7 @@ abstract class _page {
      * @return string
      */
     public function get() {
-        return $this->getHeader() . $this->getBody() . $this->getFooter();
+        return $this->getHeader() . "\n".'<main>' . "\n\t" . $this->getBody() . "\n" .'</main>'."\n" . $this->getFooter();
     }
 
     /**
@@ -37,6 +39,9 @@ abstract class _page {
         if ($this->requires_login && !\user::isLoggedIn()) {
             header('location: /?r=' . urlencode(uri));
         }
+
+        $module_name = ucwords(str_replace(['_', '-', 'page\\'], ' ', get_called_class()));
+        $this->setTitleTag($module_name);
     }
 
     /**
@@ -81,9 +86,10 @@ abstract class _page {
         $html = '<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>ForexTrader</title>
     <meta name="robots" content="noindex,nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>' . $this->getTitleTag() . '</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="/css/bootstrap-theme.min.css" type="text/css" />
     <link rel="stylesheet" href="/css/styles.css" type="text/css" />
