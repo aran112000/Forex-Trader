@@ -66,7 +66,8 @@ abstract class _page {
             $html .= '<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
           <li role="presentation"' . (uri == '/' ? ' class="active"' : '') . '><a href="/"><i class="glyphicon glyphicon-th"></i> Dashboard</a></li>
-          <li role="presentation"' . (uri == '/trade-history' ? ' class="active"' : '') . '><a href="/trade-history"><i class="glyphicon glyphicon-signal"> </i> History</a></li>
+          <li role="presentation"' . (uri == '/chart' ? ' class="active"' : '') . '><a href="/chart"><i class="glyphicon glyphicon-signal"> </i> Charting</a></li>
+          <li role="presentation"' . (uri == '/trade-history' ? ' class="active"' : '') . '><a href="/trade-history"><i class="glyphicon glyphicon-calendar"> </i> History</a></li>
           <li role="presentation"' . (uri == '/settings' ? ' class="active"' : '') . '><a href="/settings"><i class="glyphicon glyphicon-cog"> </i> Settings</a></li>
           <li role="presentation"' . (uri == '/logout' ? ' class="active"' : '') . '><a href="/logout"><i class="glyphicon glyphicon-lock"> </i> Logout</a></li>
         </ul>
