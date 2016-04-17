@@ -1,0 +1,14 @@
+{
+  "name": "ForexTrader",
+  "short_name": "ForexTrader",
+  "icons": [
+    {
+      "src": "images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "gcm_sender_id": "262234704792"
+}

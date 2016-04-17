@@ -8,16 +8,24 @@ namespace page;
  */
 class dashboard extends _page {
 
+    public function __construct() {
+        self::setJsFiles('/js/push.js');
+    }
+
     /**
      * @return string
      */
     protected function getBody(): string {
         return '<h1>Dashboard</h1>
-        <p class="lead">Welcome back ' . \user::get()['first_name'] . '</p>
+        <p class="lead">Welcome back ' . \user::get()['first_name'] . ' - ' . $this->getNotificationSubscribeButton() . '</p>
         <div class="row">
             <div class="col-md-6">' . self::getActiveTrades() . '</div>
             <div class="col-md-6">' . self::getRecentTrades() . '</div>
         </div>';
+    }
+
+    protected function getNotificationSubscribeButton() {
+        return '<button class="js-push-button" onclick="subscribe()">Subscribe</button>';
     }
 
     /**
